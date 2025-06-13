@@ -3,24 +3,24 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { 
-  Play, 
-  Download, 
-  Edit, 
-  Trash2, 
-  FileText, 
+import {
+  Play,
+  Download,
+  Edit,
+  Trash2,
+  FileText,
   Calendar,
   User,
   Tag,
   Eye,
-  MoreVertical
-} from 'lucide-react';
+  MoreVertical } from
+'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
+  DropdownMenuTrigger } from
+'@/components/ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
 
 interface Presentation {
@@ -41,10 +41,10 @@ interface PresentationListProps {
   refreshTrigger: number;
 }
 
-const PresentationList: React.FC<PresentationListProps> = ({ 
-  userId, 
-  onSelectPresentation, 
-  refreshTrigger 
+const PresentationList: React.FC<PresentationListProps> = ({
+  userId,
+  onSelectPresentation,
+  refreshTrigger
 }) => {
   const [presentations, setPresentations] = useState<Presentation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -60,8 +60,8 @@ const PresentationList: React.FC<PresentationListProps> = ({
         OrderByField: "ID",
         IsAsc: false,
         Filters: [
-          { name: "user_id", op: "Equal", value: userId }
-        ]
+        { name: "user_id", op: "Equal", value: userId }]
+
       });
 
       if (error) throw error;
@@ -94,7 +94,7 @@ const PresentationList: React.FC<PresentationListProps> = ({
         description: "Presentation deleted successfully."
       });
 
-      setPresentations(prev => prev.filter(p => p.ID !== presentationId));
+      setPresentations((prev) => prev.filter((p) => p.ID !== presentationId));
     } catch (error) {
       console.error('Error deleting presentation:', error);
       toast({
@@ -121,7 +121,7 @@ const PresentationList: React.FC<PresentationListProps> = ({
 
   const formatTags = (tags: string) => {
     if (!tags) return [];
-    return tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+    return tags.split(',').map((tag) => tag.trim()).filter((tag) => tag.length > 0);
   };
 
   if (loading) {
@@ -132,8 +132,8 @@ const PresentationList: React.FC<PresentationListProps> = ({
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
           </div>
         </CardContent>
-      </Card>
-    );
+      </Card>);
+
   }
 
   if (presentations.length === 0) {
@@ -150,8 +150,8 @@ const PresentationList: React.FC<PresentationListProps> = ({
             </p>
           </div>
         </CardContent>
-      </Card>
-    );
+      </Card>);
+
   }
 
   return (
@@ -162,14 +162,14 @@ const PresentationList: React.FC<PresentationListProps> = ({
       </div>
 
       <div className="grid gap-4">
-        {presentations.map((presentation) => (
-          <Card 
-            key={presentation.ID}
-            className={`transition-all cursor-pointer hover:shadow-md ${
-              selectedId === presentation.ID ? 'ring-2 ring-blue-500' : ''
-            }`}
-            onClick={() => handleSelect(presentation)}
-          >
+        {presentations.map((presentation) =>
+        <Card
+          key={presentation.ID}
+          className={`transition-all cursor-pointer hover:shadow-md ${
+          selectedId === presentation.ID ? 'ring-2 ring-blue-500' : ''}`
+          }
+          onClick={() => handleSelect(presentation)}>
+
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between">
                 <div className="flex-1 min-w-0">
@@ -196,16 +196,16 @@ const PresentationList: React.FC<PresentationListProps> = ({
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem onClick={(e) => {
-                      e.stopPropagation();
-                      handleSelect(presentation);
-                    }}>
+                    e.stopPropagation();
+                    handleSelect(presentation);
+                  }}>
                       <Eye className="w-4 h-4 mr-2" />
                       View
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={(e) => {
-                      e.stopPropagation();
-                      handleDelete(presentation.ID);
-                    }}>
+                    e.stopPropagation();
+                    handleDelete(presentation.ID);
+                  }}>
                       <Trash2 className="w-4 h-4 mr-2" />
                       Delete
                     </DropdownMenuItem>
@@ -215,37 +215,37 @@ const PresentationList: React.FC<PresentationListProps> = ({
             </CardHeader>
 
             <CardContent className="pt-0">
-              {presentation.description && (
-                <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+              {presentation.description &&
+            <p className="text-sm text-gray-600 mb-3 line-clamp-2">
                   {presentation.description}
                 </p>
-              )}
+            }
 
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  {formatTags(presentation.tags).map((tag, index) => (
-                    <Badge key={index} variant="outline" className="text-xs">
+                  {formatTags(presentation.tags).map((tag, index) =>
+                <Badge key={index} variant="outline" className="text-xs">
                       <Tag className="w-3 h-3 mr-1" />
                       {tag}
                     </Badge>
-                  ))}
+                )}
                 </div>
 
                 <div className="flex items-center space-x-2">
-                  <Badge 
-                    variant={presentation.is_active ? "default" : "secondary"}
-                    className="text-xs"
-                  >
+                  <Badge
+                  variant={presentation.is_active ? "default" : "secondary"}
+                  className="text-xs">
+
                     {presentation.is_active ? "Active" : "Inactive"}
                   </Badge>
                   
                   <Button
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleSelect(presentation);
-                    }}
-                  >
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleSelect(presentation);
+                  }}>
+
                     <Play className="w-4 h-4 mr-1" />
                     Present
                   </Button>
@@ -253,10 +253,10 @@ const PresentationList: React.FC<PresentationListProps> = ({
               </div>
             </CardContent>
           </Card>
-        ))}
+        )}
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default PresentationList;

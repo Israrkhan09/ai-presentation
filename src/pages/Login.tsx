@@ -4,157 +4,185 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { LogIn, User, Lock } from 'lucide-react';
+import { LogIn, Mail, Lock, Mic } from 'lucide-react';
 import { useUser } from '@/contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 
-const Login = () => {
-  const { login, isLoading } = useUser();
-  const navigate = useNavigate();
-  const { toast } = useToast();
-
+const Login: React.FC = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
+  const [error, setError] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(false);
+  const { login } = useUser();
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    // Clear error when user starts typing
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: '' }));
-    }
-  };
-
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email';
-    }
-
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!validateForm()) {
+    
+    if (!formData.email.trim() || !formData.password) {
+      setError('Please fill in all fields');
       return;
     }
 
-    try {
-      const success = await login(formData.email, formData.password);
+    setIsLoading(true);
+    setError('');
 
-      if (success) {
+    try {
+      console.log('Attempting login with:', formData.email);
+      
+      const response = await window.ezsite.apis.login({
+        email: formData.email,
+        password: formData.password
+      });
+
+      if (response.error) {
+        throw new Error(response.error);
+      }
+
+      // Get user info after successful login
+      const userResponse = await window.ezsite.apis.getUserInfo();
+      if (userResponse.data && !userResponse.error) {
+        login(userResponse.data);
+        
         toast({
-          title: "Login Successful!",
-          description: "Welcome back! Redirecting to your dashboard..."
+          title: "Welcome back!",
+          description: `Hello ${userResponse.data.Name || userResponse.data.Email}! Ready to create amazing presentations?`,
         });
+        
         navigate('/dashboard');
+      } else {
+        throw new Error('Failed to get user information');
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "An error occurred during login";
+      console.error('Login error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Login failed';
+      setError(errorMessage);
       toast({
         title: "Login Failed",
         description: errorMessage,
         variant: "destructive"
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const goToRegister = () => {
-    navigate('/register');
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold flex items-center justify-center gap-2">
-            <LogIn className="h-8 w-8" />
-            Login
-          </CardTitle>
-          <p className="text-gray-600 mt-2">
-            Sign in to access your AI-powered presentation dashboard
-          </p>
-        </CardHeader>
-        
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <Label htmlFor="email" className="flex items-center gap-2">
-                <User className="h-4 w-4" />
-                Email Address
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => handleInputChange('email', e.target.value)}
-                placeholder="Enter your email address"
-                className={errors.email ? 'border-red-500' : ''} />
-
-              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
+          <CardHeader className="text-center pb-2">
+            <div className="mx-auto w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mb-4">
+              <LogIn className="h-8 w-8 text-white" />
             </div>
-            
-            <div>
-              <Label htmlFor="password" className="flex items-center gap-2">
-                <Lock className="h-4 w-4" />
-                Password
-              </Label>
-              <Input
-                id="password"
-                type="password"
-                value={formData.password}
-                onChange={(e) => handleInputChange('password', e.target.value)}
-                placeholder="Enter your password"
-                className={errors.password ? 'border-red-500' : ''} />
+            <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Welcome Back
+            </CardTitle>
+            <p className="text-gray-600 text-sm mt-2">
+              Sign in to access your personalized presentation dashboard
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {error && (
+              <Alert className="border-red-200 bg-red-50">
+                <AlertDescription className="text-red-800">{error}</AlertDescription>
+              </Alert>
+            )}
 
-              {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
-            </div>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email" className="flex items-center gap-2">
+                  <Mail className="h-4 w-4" />
+                  Email Address
+                </Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="Enter your email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="transition-all duration-200 focus:ring-2 focus:ring-blue-500"
+                  disabled={isLoading}
+                />
+              </div>
 
-            <Button
-              type="submit"
-              className="w-full"
-              size="lg"
-              disabled={isLoading}>
+              <div className="space-y-2">
+                <Label htmlFor="password" className="flex items-center gap-2">
+                  <Lock className="h-4 w-4" />
+                  Password
+                </Label>
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  placeholder="Enter your password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  className="transition-all duration-200 focus:ring-2 focus:ring-blue-500"
+                  disabled={isLoading}
+                />
+              </div>
 
-              {isLoading ? 'Signing In...' : 'Sign In'}
-            </Button>
-            
-            <div className="text-center space-y-2">
-              <Button
-                type="button"
-                variant="link"
-                onClick={goToRegister}
-                className="text-blue-600 hover:text-blue-800">
-
-                Don't have an account? Register here
+              <Button 
+                type="submit" 
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Signing in...' : 'Sign In'}
               </Button>
+            </form>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-gray-300" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-white px-2 text-gray-500">Voice-Powered Platform</span>
+              </div>
             </div>
-          </form>
 
-          {/* Demo Credentials */}
-          <Alert className="mt-4">
-            <AlertDescription>
-              <strong>Demo:</strong> Try registering a new account or use any email/password combination you create during registration.
-            </AlertDescription>
-          </Alert>
-        </CardContent>
-      </Card>
-    </div>);
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-2 text-sm text-gray-600 mb-4">
+                <Mic className="h-4 w-4" />
+                <span>Experience AI-powered presentations</span>
+              </div>
+              <div className="text-sm text-gray-600">
+                Don't have an account?{' '}
+                <button
+                  onClick={() => navigate('/register')}
+                  className="text-blue-600 hover:text-blue-800 font-medium"
+                >
+                  Create one here
+                </button>
+              </div>
+            </div>
 
+            <div className="text-center">
+              <button
+                onClick={() => {/* Handle forgot password */}}
+                className="text-sm text-blue-600 hover:text-blue-800"
+              >
+                Forgot your password?
+              </button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
 };
 
 export default Login;
