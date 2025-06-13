@@ -9,18 +9,18 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { 
-  Brain, 
-  CheckCircle, 
-  XCircle, 
-  Clock, 
-  Target, 
+import {
+  Brain,
+  CheckCircle,
+  XCircle,
+  Clock,
+  Target,
   BookOpen,
   FileText,
   Download,
   RefreshCw,
-  Lightbulb
-} from 'lucide-react';
+  Lightbulb } from
+'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface QuizQuestion {
@@ -82,8 +82,8 @@ const EnhancedQuizGenerator: React.FC<EnhancedQuizGeneratorProps> = ({
         PageNo: 1,
         PageSize: 10,
         Filters: [
-          { name: 'session_id', op: 'Equal', value: sessionId }
-        ]
+        { name: 'session_id', op: 'Equal', value: sessionId }]
+
       });
 
       if (error) throw error;
@@ -95,14 +95,14 @@ const EnhancedQuizGenerator: React.FC<EnhancedQuizGeneratorProps> = ({
               PageNo: 1,
               PageSize: 50,
               Filters: [
-                { name: 'quiz_id', op: 'Equal', value: quiz.ID }
-              ],
+              { name: 'quiz_id', op: 'Equal', value: quiz.ID }],
+
               OrderByField: 'question_number',
               IsAsc: true
             });
 
             const questions = questionsResponse.data?.List || [];
-            
+
             return {
               ...quiz,
               id: quiz.ID,
@@ -129,13 +129,13 @@ const EnhancedQuizGenerator: React.FC<EnhancedQuizGeneratorProps> = ({
       toast({
         title: "Cannot Generate Quiz",
         description: "Need active session and keywords from presentation.",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
 
     setIsGenerating(true);
-    
+
     try {
       // Create quiz record
       const { data: quizId, error: quizError } = await window.ezsite.apis.tableCreate('16753', {
@@ -153,7 +153,7 @@ const EnhancedQuizGenerator: React.FC<EnhancedQuizGeneratorProps> = ({
 
       // Generate MCQ questions
       const questions = await generateMCQQuestions(keywords.slice(0, 10));
-      
+
       for (let i = 0; i < questions.length; i++) {
         const question = questions[i];
         await window.ezsite.apis.tableCreate('16754', {
@@ -171,7 +171,7 @@ const EnhancedQuizGenerator: React.FC<EnhancedQuizGeneratorProps> = ({
 
       toast({
         title: "MCQ Quiz Generated",
-        description: `Created ${questions.length} multiple choice questions.`,
+        description: `Created ${questions.length} multiple choice questions.`
       });
 
       await loadQuizzes();
@@ -180,7 +180,7 @@ const EnhancedQuizGenerator: React.FC<EnhancedQuizGeneratorProps> = ({
       toast({
         title: "Generation Failed",
         description: "Failed to generate MCQ quiz.",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setIsGenerating(false);
@@ -192,13 +192,13 @@ const EnhancedQuizGenerator: React.FC<EnhancedQuizGeneratorProps> = ({
       toast({
         title: "Cannot Generate Quiz",
         description: "Need active session and keywords from presentation.",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
 
     setIsGenerating(true);
-    
+
     try {
       // Create quiz record
       const { data: quizId, error: quizError } = await window.ezsite.apis.tableCreate('16753', {
@@ -216,7 +216,7 @@ const EnhancedQuizGenerator: React.FC<EnhancedQuizGeneratorProps> = ({
 
       // Generate theory questions
       const questions = await generateTheoryQuestions(keywords.slice(0, 5));
-      
+
       for (let i = 0; i < questions.length; i++) {
         const question = questions[i];
         await window.ezsite.apis.tableCreate('16754', {
@@ -234,7 +234,7 @@ const EnhancedQuizGenerator: React.FC<EnhancedQuizGeneratorProps> = ({
 
       toast({
         title: "Theory Quiz Generated",
-        description: `Created ${questions.length} essay questions.`,
+        description: `Created ${questions.length} essay questions.`
       });
 
       await loadQuizzes();
@@ -243,7 +243,7 @@ const EnhancedQuizGenerator: React.FC<EnhancedQuizGeneratorProps> = ({
       toast({
         title: "Generation Failed",
         description: "Failed to generate theory quiz.",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setIsGenerating(false);
@@ -253,20 +253,20 @@ const EnhancedQuizGenerator: React.FC<EnhancedQuizGeneratorProps> = ({
   const generateMCQQuestions = async (keywords: string[]) => {
     return keywords.map((keyword, index) => {
       const questionTypes = [
-        `What is the primary significance of "${keyword}" in the context of this presentation?`,
-        `Which statement best describes the role of "${keyword}"?`,
-        `How does "${keyword}" relate to the main topic discussed?`,
-        `What is the most important aspect of "${keyword}" mentioned?`
-      ];
+      `What is the primary significance of "${keyword}" in the context of this presentation?`,
+      `Which statement best describes the role of "${keyword}"?`,
+      `How does "${keyword}" relate to the main topic discussed?`,
+      `What is the most important aspect of "${keyword}" mentioned?`];
+
 
       const questionText = questionTypes[index % questionTypes.length];
-      
+
       const correctOption = `${keyword} is a key concept that plays a central role in understanding the topic`;
       const incorrectOptions = [
-        `${keyword} is only mentioned as a minor detail`,
-        `${keyword} is not directly relevant to the main discussion`,
-        `${keyword} represents an outdated perspective on the topic`
-      ];
+      `${keyword} is only mentioned as a minor detail`,
+      `${keyword} is not directly relevant to the main discussion`,
+      `${keyword} represents an outdated perspective on the topic`];
+
 
       // Shuffle options
       const allOptions = [correctOption, ...incorrectOptions];
@@ -285,14 +285,14 @@ const EnhancedQuizGenerator: React.FC<EnhancedQuizGeneratorProps> = ({
   const generateTheoryQuestions = async (keywords: string[]) => {
     return keywords.map((keyword, index) => {
       const questionTypes = [
-        `Explain the importance of "${keyword}" and its implications in detail.`,
-        `Analyze the role of "${keyword}" and provide examples of its application.`,
-        `Discuss the significance of "${keyword}" and how it relates to the broader context.`,
-        `Evaluate the impact of "${keyword}" and explain its relevance to the field.`
-      ];
+      `Explain the importance of "${keyword}" and its implications in detail.`,
+      `Analyze the role of "${keyword}" and provide examples of its application.`,
+      `Discuss the significance of "${keyword}" and how it relates to the broader context.`,
+      `Evaluate the impact of "${keyword}" and explain its relevance to the field.`];
+
 
       const questionText = questionTypes[index % questionTypes.length];
-      
+
       return {
         text: questionText,
         sampleAnswer: `A comprehensive answer should explain the key aspects of "${keyword}", its significance in the context discussed, and provide relevant examples or applications. Students should demonstrate understanding of how this concept relates to the broader topic and its practical implications.`,
@@ -312,7 +312,7 @@ const EnhancedQuizGenerator: React.FC<EnhancedQuizGeneratorProps> = ({
   };
 
   const handleAnswerChange = (questionId: number, answer: string) => {
-    setUserAnswers(prev => ({
+    setUserAnswers((prev) => ({
       ...prev,
       [questionId]: answer
     }));
@@ -320,13 +320,13 @@ const EnhancedQuizGenerator: React.FC<EnhancedQuizGeneratorProps> = ({
 
   const nextQuestion = () => {
     if (activeQuiz && currentQuestionIndex < activeQuiz.questions.length - 1) {
-      setCurrentQuestionIndex(prev => prev + 1);
+      setCurrentQuestionIndex((prev) => prev + 1);
     }
   };
 
   const previousQuestion = () => {
     if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(prev => prev - 1);
+      setCurrentQuestionIndex((prev) => prev - 1);
     }
   };
 
@@ -340,15 +340,15 @@ const EnhancedQuizGenerator: React.FC<EnhancedQuizGeneratorProps> = ({
     let totalPoints = 0;
     let earnedPoints = 0;
 
-    const results = activeQuiz.questions.map(question => {
+    const results = activeQuiz.questions.map((question) => {
       const userAnswer = userAnswers[question.id];
       const isCorrect = userAnswer === question.correct_answer;
-      
+
       if (isCorrect) {
         correctAnswers++;
         earnedPoints += question.points;
       }
-      
+
       totalPoints += question.points;
 
       return {
@@ -361,7 +361,7 @@ const EnhancedQuizGenerator: React.FC<EnhancedQuizGeneratorProps> = ({
       };
     });
 
-    const score = Math.round((earnedPoints / totalPoints) * 100);
+    const score = Math.round(earnedPoints / totalPoints * 100);
 
     setQuizResults({
       score,
@@ -418,16 +418,16 @@ const EnhancedQuizGenerator: React.FC<EnhancedQuizGeneratorProps> = ({
                 Question {currentQuestionIndex + 1} of {activeQuiz.questions.length}
               </Badge>
             </CardTitle>
-            <Progress 
-              value={((currentQuestionIndex + 1) / activeQuiz.questions.length) * 100} 
-              className="w-full"
-            />
+            <Progress
+              value={(currentQuestionIndex + 1) / activeQuiz.questions.length * 100}
+              className="w-full" />
+
           </CardHeader>
         </Card>
 
         {/* Current Question */}
-        {currentQuestion && (
-          <Card>
+        {currentQuestion &&
+        <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Target className="h-5 w-5" />
@@ -437,62 +437,62 @@ const EnhancedQuizGenerator: React.FC<EnhancedQuizGeneratorProps> = ({
             <CardContent className="space-y-6">
               <p className="text-lg">{currentQuestion.question_text}</p>
 
-              {currentQuestion.question_type === 'MCQ' && (
-                <RadioGroup
-                  value={userAnswers[currentQuestion.id] || ''}
-                  onValueChange={(value) => handleAnswerChange(currentQuestion.id, value)}
-                >
-                  {currentQuestion.options.map((option, index) => (
-                    <div key={index} className="flex items-center space-x-2">
+              {currentQuestion.question_type === 'MCQ' &&
+            <RadioGroup
+              value={userAnswers[currentQuestion.id] || ''}
+              onValueChange={(value) => handleAnswerChange(currentQuestion.id, value)}>
+
+                  {currentQuestion.options.map((option, index) =>
+              <div key={index} className="flex items-center space-x-2">
                       <RadioGroupItem value={option} id={`option-${index}`} />
                       <Label htmlFor={`option-${index}`} className="text-base cursor-pointer">
                         {option}
                       </Label>
                     </div>
-                  ))}
+              )}
                 </RadioGroup>
-              )}
+            }
 
-              {currentQuestion.question_type === 'Essay' && (
-                <Textarea
-                  placeholder="Type your answer here..."
-                  value={userAnswers[currentQuestion.id] || ''}
-                  onChange={(e) => handleAnswerChange(currentQuestion.id, e.target.value)}
-                  rows={6}
-                />
-              )}
+              {currentQuestion.question_type === 'Essay' &&
+            <Textarea
+              placeholder="Type your answer here..."
+              value={userAnswers[currentQuestion.id] || ''}
+              onChange={(e) => handleAnswerChange(currentQuestion.id, e.target.value)}
+              rows={6} />
+
+            }
 
               <div className="flex justify-between">
                 <Button
-                  onClick={previousQuestion}
-                  disabled={currentQuestionIndex === 0}
-                  variant="outline"
-                >
+                onClick={previousQuestion}
+                disabled={currentQuestionIndex === 0}
+                variant="outline">
+
                   Previous
                 </Button>
 
-                {currentQuestionIndex === activeQuiz.questions.length - 1 ? (
-                  <Button
-                    onClick={submitQuiz}
-                    disabled={!userAnswers[currentQuestion.id]}
-                    className="bg-green-600 hover:bg-green-700"
-                  >
+                {currentQuestionIndex === activeQuiz.questions.length - 1 ?
+              <Button
+                onClick={submitQuiz}
+                disabled={!userAnswers[currentQuestion.id]}
+                className="bg-green-600 hover:bg-green-700">
+
                     Submit Quiz
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={nextQuestion}
-                    disabled={!userAnswers[currentQuestion.id]}
-                  >
+                  </Button> :
+
+              <Button
+                onClick={nextQuestion}
+                disabled={!userAnswers[currentQuestion.id]}>
+
                     Next
                   </Button>
-                )}
+              }
               </div>
             </CardContent>
           </Card>
-        )}
-      </div>
-    );
+        }
+      </div>);
+
   }
 
   if (quizResults && activeQuiz) {
@@ -536,14 +536,14 @@ const EnhancedQuizGenerator: React.FC<EnhancedQuizGeneratorProps> = ({
           <CardContent>
             <ScrollArea className="h-96">
               <div className="space-y-4">
-                {quizResults.results.map((result: any, index: number) => (
-                  <div key={index} className="border rounded-lg p-4">
+                {quizResults.results.map((result: any, index: number) =>
+                <div key={index} className="border rounded-lg p-4">
                     <div className="flex items-center gap-2 mb-2">
-                      {result.isCorrect ? (
-                        <CheckCircle className="h-5 w-5 text-green-500" />
-                      ) : (
-                        <XCircle className="h-5 w-5 text-red-500" />
-                      )}
+                      {result.isCorrect ?
+                    <CheckCircle className="h-5 w-5 text-green-500" /> :
+
+                    <XCircle className="h-5 w-5 text-red-500" />
+                    }
                       <span className="font-medium">Question {index + 1}</span>
                       <Badge variant={result.isCorrect ? "default" : "destructive"}>
                         {result.points} points
@@ -558,7 +558,7 @@ const EnhancedQuizGenerator: React.FC<EnhancedQuizGeneratorProps> = ({
                       <p className="text-gray-600">{result.explanation}</p>
                     </div>
                   </div>
-                ))}
+                )}
               </div>
             </ScrollArea>
           </CardContent>
@@ -574,8 +574,8 @@ const EnhancedQuizGenerator: React.FC<EnhancedQuizGeneratorProps> = ({
             Export Results
           </Button>
         </div>
-      </div>
-    );
+      </div>);
+
   }
 
   return (
@@ -594,13 +594,13 @@ const EnhancedQuizGenerator: React.FC<EnhancedQuizGeneratorProps> = ({
               <Button
                 onClick={generateMCQQuiz}
                 disabled={isGenerating || !sessionId || keywords.length === 0}
-                className="flex items-center gap-2 h-20"
-              >
-                {isGenerating ? (
-                  <RefreshCw className="h-4 w-4 animate-spin" />
-                ) : (
-                  <CheckCircle className="h-4 w-4" />
-                )}
+                className="flex items-center gap-2 h-20">
+
+                {isGenerating ?
+                <RefreshCw className="h-4 w-4 animate-spin" /> :
+
+                <CheckCircle className="h-4 w-4" />
+                }
                 <div className="text-left">
                   <div className="font-medium">Generate MCQ Quiz</div>
                   <div className="text-xs opacity-80">Multiple choice questions</div>
@@ -611,13 +611,13 @@ const EnhancedQuizGenerator: React.FC<EnhancedQuizGeneratorProps> = ({
                 onClick={generateTheoryQuiz}
                 disabled={isGenerating || !sessionId || keywords.length === 0}
                 variant="outline"
-                className="flex items-center gap-2 h-20"
-              >
-                {isGenerating ? (
-                  <RefreshCw className="h-4 w-4 animate-spin" />
-                ) : (
-                  <FileText className="h-4 w-4" />
-                )}
+                className="flex items-center gap-2 h-20">
+
+                {isGenerating ?
+                <RefreshCw className="h-4 w-4 animate-spin" /> :
+
+                <FileText className="h-4 w-4" />
+                }
                 <div className="text-left">
                   <div className="font-medium">Generate Theory Quiz</div>
                   <div className="text-xs opacity-80">Essay-based questions</div>
@@ -625,35 +625,35 @@ const EnhancedQuizGenerator: React.FC<EnhancedQuizGeneratorProps> = ({
               </Button>
             </div>
 
-            {keywords.length > 0 && (
-              <div>
+            {keywords.length > 0 &&
+            <div>
                 <p className="text-sm font-medium mb-2">Available Keywords ({keywords.length}):</p>
                 <div className="flex flex-wrap gap-2">
-                  {keywords.slice(0, 10).map((keyword, index) => (
-                    <Badge key={index} variant="secondary">
+                  {keywords.slice(0, 10).map((keyword, index) =>
+                <Badge key={index} variant="secondary">
                       {keyword}
                     </Badge>
-                  ))}
-                  {keywords.length > 10 && (
-                    <Badge variant="outline">+{keywords.length - 10} more</Badge>
-                  )}
+                )}
+                  {keywords.length > 10 &&
+                <Badge variant="outline">+{keywords.length - 10} more</Badge>
+                }
                 </div>
               </div>
-            )}
+            }
           </div>
         </CardContent>
       </Card>
 
       {/* Generated Quizzes */}
-      {generatedQuizzes.length > 0 && (
-        <Card>
+      {generatedQuizzes.length > 0 &&
+      <Card>
           <CardHeader>
             <CardTitle>Generated Quizzes</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {generatedQuizzes.map((quiz) => (
-                <div key={quiz.id} className="border rounded-lg p-4">
+              {generatedQuizzes.map((quiz) =>
+            <div key={quiz.id} className="border rounded-lg p-4">
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-medium">{quiz.quiz_title}</h3>
                     <div className="flex items-center gap-2">
@@ -680,29 +680,29 @@ const EnhancedQuizGenerator: React.FC<EnhancedQuizGeneratorProps> = ({
                   <div className="mb-3">
                     <p className="text-sm font-medium mb-1">Topics Covered:</p>
                     <div className="flex flex-wrap gap-1">
-                      {quiz.topics_covered.slice(0, 5).map((topic: string, index: number) => (
-                        <Badge key={index} variant="outline" size="sm">
+                      {quiz.topics_covered.slice(0, 5).map((topic: string, index: number) =>
+                  <Badge key={index} variant="outline" size="sm">
                           {topic}
                         </Badge>
-                      ))}
+                  )}
                     </div>
                   </div>
                   
-                  <Button 
-                    onClick={() => startQuiz(quiz)}
-                    className="w-full"
-                  >
+                  <Button
+                onClick={() => startQuiz(quiz)}
+                className="w-full">
+
                     Start Quiz
                   </Button>
                 </div>
-              ))}
+            )}
             </div>
           </CardContent>
         </Card>
-      )}
+      }
 
-      {generatedQuizzes.length === 0 && (
-        <Card>
+      {generatedQuizzes.length === 0 &&
+      <Card>
           <CardContent className="text-center py-8">
             <Lightbulb className="h-12 w-12 mx-auto text-gray-400 mb-4" />
             <p className="text-gray-500">
@@ -710,9 +710,9 @@ const EnhancedQuizGenerator: React.FC<EnhancedQuizGeneratorProps> = ({
             </p>
           </CardContent>
         </Card>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 };
 
 export default EnhancedQuizGenerator;

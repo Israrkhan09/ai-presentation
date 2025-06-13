@@ -6,18 +6,18 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
-import { 
-  Brain, 
-  FileText, 
-  Mic, 
-  BarChart3, 
+import {
+  Brain,
+  FileText,
+  Mic,
+  BarChart3,
   Download,
   Upload,
   Play,
   Settings,
   ArrowLeft,
-  CheckCircle
-} from 'lucide-react';
+  CheckCircle } from
+'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import SmartPresentationViewer from '@/components/SmartPresentationViewer';
 import RealTimeTranscriber from '@/components/RealTimeTranscriber';
@@ -39,7 +39,7 @@ interface TranscriptionData {
 const SmartPresentationPage: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  
+
   const [activeTab, setActiveTab] = useState('presentation');
   const [presentationId, setPresentationId] = useState<number | null>(null);
   const [sessionId, setSessionId] = useState<number | null>(null);
@@ -61,8 +61,8 @@ const SmartPresentationPage: React.FC = () => {
         PageNo: 1,
         PageSize: 10,
         Filters: [
-          { name: 'is_active', op: 'Equal', value: true }
-        ],
+        { name: 'is_active', op: 'Equal', value: true }],
+
         OrderByField: 'ID',
         IsAsc: false
       });
@@ -110,7 +110,7 @@ const SmartPresentationPage: React.FC = () => {
 
       toast({
         title: "Presentation Uploaded",
-        description: "Ready to start smart presentation session.",
+        description: "Ready to start smart presentation session."
       });
 
       setActiveTab('presentation');
@@ -119,7 +119,7 @@ const SmartPresentationPage: React.FC = () => {
       toast({
         title: "Upload Failed",
         description: "Failed to upload presentation file.",
-        variant: "destructive",
+        variant: "destructive"
       });
     }
   };
@@ -130,28 +130,28 @@ const SmartPresentationPage: React.FC = () => {
     setSessionDuration(0);
     setTranscriptionData([]);
     setAllKeywords([]);
-    
+
     toast({
       title: "Smart Session Started",
-      description: "All AI features are now active.",
+      description: "All AI features are now active."
     });
   };
 
   const handleSessionEnd = (sessionData: any) => {
     setIsSessionActive(false);
-    
+
     toast({
       title: "Session Completed",
-      description: "Summary and quiz materials have been generated.",
+      description: "Summary and quiz materials have been generated."
     });
-    
+
     // Switch to analytics tab
     setActiveTab('analytics');
   };
 
   const handleTranscription = (data: TranscriptionData) => {
-    setTranscriptionData(prev => [...prev, data]);
-    
+    setTranscriptionData((prev) => [...prev, data]);
+
     // Update current slide if needed
     if (data.slideNumber !== currentSlide) {
       setCurrentSlide(data.slideNumber);
@@ -159,21 +159,21 @@ const SmartPresentationPage: React.FC = () => {
   };
 
   const handleKeywordsDetected = (keywords: string[]) => {
-    setAllKeywords(prev => {
-      const newKeywords = keywords.filter(kw => !prev.includes(kw));
+    setAllKeywords((prev) => {
+      const newKeywords = keywords.filter((kw) => !prev.includes(kw));
       return [...prev, ...newKeywords];
     });
   };
 
   const handleVoiceCommand = (command: string) => {
     console.log('Voice command received:', command);
-    
+
     switch (command) {
       case 'next':
-        setCurrentSlide(prev => prev + 1);
+        setCurrentSlide((prev) => prev + 1);
         break;
       case 'previous':
-        setCurrentSlide(prev => Math.max(1, prev - 1));
+        setCurrentSlide((prev) => Math.max(1, prev - 1));
         break;
       case 'generate_quiz':
         setActiveTab('quiz');
@@ -197,8 +197,8 @@ const SmartPresentationPage: React.FC = () => {
                 <Button
                   onClick={() => navigate('/dashboard')}
                   variant="outline"
-                  size="sm"
-                >
+                  size="sm">
+
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back to Dashboard
                 </Button>
@@ -213,8 +213,8 @@ const SmartPresentationPage: React.FC = () => {
                 </div>
               </div>
               
-              {isSessionActive && (
-                <div className="flex items-center gap-4">
+              {isSessionActive &&
+              <div className="flex items-center gap-4">
                   <Badge variant="outline" className="bg-green-50 text-green-700">
                     <CheckCircle className="h-3 w-3 mr-1" />
                     Session Active
@@ -226,7 +226,7 @@ const SmartPresentationPage: React.FC = () => {
                     </div>
                   </div>
                 </div>
-              )}
+              }
             </div>
           </CardHeader>
         </Card>
@@ -271,8 +271,8 @@ const SmartPresentationPage: React.FC = () => {
                   <FileUploader
                     acceptedTypes={['.pdf', '.pptx', '.ppt']}
                     maxSize={50}
-                    onUpload={handleFileUpload}
-                  />
+                    onUpload={handleFileUpload} />
+
                 </CardContent>
               </Card>
 
@@ -282,13 +282,13 @@ const SmartPresentationPage: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    {presentations.length === 0 ? (
-                      <p className="text-gray-500 text-center py-8">
+                    {presentations.length === 0 ?
+                    <p className="text-gray-500 text-center py-8">
                         No presentations uploaded yet. Upload your first presentation to get started.
-                      </p>
-                    ) : (
-                      presentations.map((presentation) => (
-                        <div key={presentation.id} className="border rounded-lg p-4">
+                      </p> :
+
+                    presentations.map((presentation) =>
+                    <div key={presentation.id} className="border rounded-lg p-4">
                           <div className="flex items-center justify-between">
                             <div>
                               <h3 className="font-medium">{presentation.title}</h3>
@@ -297,26 +297,26 @@ const SmartPresentationPage: React.FC = () => {
                                 <Badge variant="outline">
                                   {presentation.slide_count} slides
                                 </Badge>
-                                {presentation.keywords.length > 0 && (
-                                  <Badge variant="secondary">
+                                {presentation.keywords.length > 0 &&
+                            <Badge variant="secondary">
                                     {presentation.keywords.length} keywords
                                   </Badge>
-                                )}
+                            }
                               </div>
                             </div>
                             <Button
-                              onClick={() => {
-                                setPresentationId(presentation.id);
-                                setActiveTab('presentation');
-                              }}
-                              size="sm"
-                            >
+                          onClick={() => {
+                            setPresentationId(presentation.id);
+                            setActiveTab('presentation');
+                          }}
+                          size="sm">
+
                               Select
                             </Button>
                           </div>
                         </div>
-                      ))
-                    )}
+                    )
+                    }
                   </div>
                 </CardContent>
               </Card>
@@ -325,27 +325,27 @@ const SmartPresentationPage: React.FC = () => {
 
           {/* Presentation Tab */}
           <TabsContent value="presentation" className="space-y-6">
-            {presentationId ? (
-              <SmartPresentationViewer
-                presentationId={presentationId}
-                onSessionEnd={handleSessionEnd}
-              />
-            ) : (
-              <Card className="bg-white/80 backdrop-blur-sm">
+            {presentationId ?
+            <SmartPresentationViewer
+              presentationId={presentationId}
+              onSessionEnd={handleSessionEnd} /> :
+
+
+            <Card className="bg-white/80 backdrop-blur-sm">
                 <CardContent className="text-center py-12">
                   <FileText className="h-12 w-12 mx-auto text-gray-400 mb-4" />
                   <p className="text-gray-500">
                     Please upload and select a presentation to begin.
                   </p>
                   <Button
-                    onClick={() => setActiveTab('upload')}
-                    className="mt-4"
-                  >
+                  onClick={() => setActiveTab('upload')}
+                  className="mt-4">
+
                     Upload Presentation
                   </Button>
                 </CardContent>
               </Card>
-            )}
+            }
           </TabsContent>
 
           {/* Transcription Tab */}
@@ -356,8 +356,8 @@ const SmartPresentationPage: React.FC = () => {
               onTranscription={handleTranscription}
               onKeywordsDetected={handleKeywordsDetected}
               onVoiceCommand={handleVoiceCommand}
-              isActive={isSessionActive}
-            />
+              isActive={isSessionActive} />
+
           </TabsContent>
 
           {/* Quiz Tab */}
@@ -369,10 +369,10 @@ const SmartPresentationPage: React.FC = () => {
               onQuizGenerated={(quiz) => {
                 toast({
                   title: "Quiz Generated",
-                  description: `${quiz.quiz_type} quiz with ${quiz.total_questions} questions created.`,
+                  description: `${quiz.quiz_type} quiz with ${quiz.total_questions} questions created.`
                 });
-              }}
-            />
+              }} />
+
           </TabsContent>
 
           {/* Summary Tab */}
@@ -386,16 +386,16 @@ const SmartPresentationPage: React.FC = () => {
               onSummaryGenerated={(summary) => {
                 toast({
                   title: "Summary Generated",
-                  description: "Comprehensive presentation summary is ready.",
+                  description: "Comprehensive presentation summary is ready."
                 });
-              }}
-            />
+              }} />
+
           </TabsContent>
         </Tabs>
 
         {/* Session Statistics */}
-        {isSessionActive && (
-          <Card className="bg-white/80 backdrop-blur-sm">
+        {isSessionActive &&
+        <Card className="bg-white/80 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <BarChart3 className="h-5 w-5" />
@@ -424,24 +424,24 @@ const SmartPresentationPage: React.FC = () => {
                 </div>
               </div>
               
-              {allKeywords.length > 0 && (
-                <div className="mt-4">
+              {allKeywords.length > 0 &&
+            <div className="mt-4">
                   <p className="text-sm font-medium mb-2">Recent Keywords:</p>
                   <div className="flex flex-wrap gap-2">
-                    {allKeywords.slice(-10).map((keyword, index) => (
-                      <Badge key={index} variant="secondary">
+                    {allKeywords.slice(-10).map((keyword, index) =>
+                <Badge key={index} variant="secondary">
                         {keyword}
                       </Badge>
-                    ))}
+                )}
                   </div>
                 </div>
-              )}
+            }
             </CardContent>
           </Card>
-        )}
+        }
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default SmartPresentationPage;

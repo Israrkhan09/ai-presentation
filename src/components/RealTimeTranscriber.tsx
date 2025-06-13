@@ -5,16 +5,16 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { 
-  Mic, 
-  MicOff, 
-  Volume2, 
-  VolumeX, 
+import {
+  Mic,
+  MicOff,
+  Volume2,
+  VolumeX,
   Activity,
   Brain,
   Gauge,
-  TrendingUp
-} from 'lucide-react';
+  TrendingUp } from
+'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface TranscriptionData {
@@ -64,24 +64,24 @@ const RealTimeTranscriber: React.FC<RealTimeTranscriberProps> = ({
   // Voice command patterns
   const voiceCommands = {
     navigation: [
-      { pattern: /next\s+slide/i, command: 'next' },
-      { pattern: /previous\s+slide/i, command: 'previous' },
-      { pattern: /go\s+to\s+slide\s+(\d+)/i, command: 'goto' },
-      { pattern: /first\s+slide/i, command: 'first' },
-      { pattern: /last\s+slide/i, command: 'last' }
-    ],
+    { pattern: /next\s+slide/i, command: 'next' },
+    { pattern: /previous\s+slide/i, command: 'previous' },
+    { pattern: /go\s+to\s+slide\s+(\d+)/i, command: 'goto' },
+    { pattern: /first\s+slide/i, command: 'first' },
+    { pattern: /last\s+slide/i, command: 'last' }],
+
     control: [
-      { pattern: /start\s+recording/i, command: 'start_recording' },
-      { pattern: /stop\s+recording/i, command: 'stop_recording' },
-      { pattern: /pause\s+presentation/i, command: 'pause' },
-      { pattern: /resume\s+presentation/i, command: 'resume' }
-    ],
+    { pattern: /start\s+recording/i, command: 'start_recording' },
+    { pattern: /stop\s+recording/i, command: 'stop_recording' },
+    { pattern: /pause\s+presentation/i, command: 'pause' },
+    { pattern: /resume\s+presentation/i, command: 'resume' }],
+
     generation: [
-      { pattern: /generate\s+quiz/i, command: 'generate_quiz' },
-      { pattern: /create\s+summary/i, command: 'create_summary' },
-      { pattern: /download\s+notes/i, command: 'download_notes' },
-      { pattern: /show\s+keywords/i, command: 'show_keywords' }
-    ]
+    { pattern: /generate\s+quiz/i, command: 'generate_quiz' },
+    { pattern: /create\s+summary/i, command: 'create_summary' },
+    { pattern: /download\s+notes/i, command: 'download_notes' },
+    { pattern: /show\s+keywords/i, command: 'show_keywords' }]
+
   };
 
   // Initialize speech recognition and audio analysis
@@ -99,7 +99,7 @@ const RealTimeTranscriber: React.FC<RealTimeTranscriberProps> = ({
   const initializeSpeechRecognition = () => {
     if (typeof window !== 'undefined' && 'webkitSpeechRecognition' in window) {
       const recognition = new (window as any).webkitSpeechRecognition();
-      
+
       recognition.continuous = true;
       recognition.interimResults = true;
       recognition.lang = 'en-US';
@@ -113,7 +113,7 @@ const RealTimeTranscriber: React.FC<RealTimeTranscriberProps> = ({
       recognition.onend = () => {
         setIsListening(false);
         console.log('Speech recognition ended');
-        
+
         // Auto-restart if still recording
         if (isRecording && isActive) {
           setTimeout(() => {
@@ -147,18 +147,18 @@ const RealTimeTranscriber: React.FC<RealTimeTranscriberProps> = ({
 
       recognition.onerror = (event: any) => {
         console.error('Speech recognition error:', event.error);
-        
+
         if (event.error === 'not-allowed') {
           toast({
             title: "Microphone Access Denied",
             description: "Please allow microphone access for transcription features.",
-            variant: "destructive",
+            variant: "destructive"
           });
         } else if (event.error === 'network') {
           toast({
             title: "Network Error",
             description: "Speech recognition requires an internet connection.",
-            variant: "destructive",
+            variant: "destructive"
           });
         }
       };
@@ -168,7 +168,7 @@ const RealTimeTranscriber: React.FC<RealTimeTranscriberProps> = ({
       toast({
         title: "Speech Recognition Not Supported",
         description: "Your browser doesn't support speech recognition.",
-        variant: "destructive",
+        variant: "destructive"
       });
     }
   };
@@ -176,18 +176,18 @@ const RealTimeTranscriber: React.FC<RealTimeTranscriberProps> = ({
   const initializeAudioAnalysis = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      
+
       const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
       const analyser = audioContext.createAnalyser();
       const microphone = audioContext.createMediaStreamSource(stream);
-      
+
       analyser.fftSize = 256;
       microphone.connect(analyser);
-      
+
       audioContextRef.current = audioContext;
       analyserRef.current = analyser;
       microphoneRef.current = microphone;
-      
+
       startAudioLevelMonitoring();
     } catch (error) {
       console.error('Error initializing audio analysis:', error);
@@ -203,10 +203,10 @@ const RealTimeTranscriber: React.FC<RealTimeTranscriberProps> = ({
     const updateAudioLevel = () => {
       analyser.getByteFrequencyData(dataArray);
       const average = dataArray.reduce((sum, value) => sum + value, 0) / dataArray.length;
-      const normalizedLevel = Math.min(100, (average / 255) * 100);
-      
+      const normalizedLevel = Math.min(100, average / 255 * 100);
+
       setAudioLevel(normalizedLevel);
-      
+
       if (isRecording) {
         animationRef.current = requestAnimationFrame(updateAudioLevel);
       }
@@ -228,11 +228,11 @@ const RealTimeTranscriber: React.FC<RealTimeTranscriberProps> = ({
     };
 
     // Update local state
-    setTranscriptions(prev => [...prev, transcriptionData]);
-    setTotalWords(prev => prev + text.split(/\s+/).length);
-    setAvgConfidence(prev => {
+    setTranscriptions((prev) => [...prev, transcriptionData]);
+    setTotalWords((prev) => prev + text.split(/\s+/).length);
+    setAvgConfidence((prev) => {
       const total = transcriptions.length + 1;
-      return ((prev * (total - 1)) + confidence) / total;
+      return (prev * (total - 1) + confidence) / total;
     });
     setCurrentPace(transcriptionData.speakingPace);
 
@@ -268,23 +268,23 @@ const RealTimeTranscriber: React.FC<RealTimeTranscriberProps> = ({
 
   const extractKeywords = (text: string): string[] => {
     const stopWords = new Set([
-      'the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 
-      'from', 'up', 'about', 'into', 'through', 'during', 'before', 'after', 'above', 
-      'below', 'under', 'between', 'among', 'within', 'without', 'toward', 'towards',
-      'a', 'an', 'as', 'are', 'was', 'were', 'been', 'be', 'have', 'has', 'had', 
-      'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'can',
-      'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she', 'it', 'we', 'they',
-      'my', 'your', 'his', 'her', 'its', 'our', 'their', 'me', 'him', 'us', 'them'
-    ]);
+    'the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by',
+    'from', 'up', 'about', 'into', 'through', 'during', 'before', 'after', 'above',
+    'below', 'under', 'between', 'among', 'within', 'without', 'toward', 'towards',
+    'a', 'an', 'as', 'are', 'was', 'were', 'been', 'be', 'have', 'has', 'had',
+    'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'can',
+    'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she', 'it', 'we', 'they',
+    'my', 'your', 'his', 'her', 'its', 'our', 'their', 'me', 'him', 'us', 'them']
+    );
 
-    const words = text.toLowerCase()
-      .replace(/[^\w\s]/g, '')
-      .split(/\s+/)
-      .filter(word => 
-        word.length > 3 && 
-        !stopWords.has(word) && 
-        !/^\d+$/.test(word)
-      );
+    const words = text.toLowerCase().
+    replace(/[^\w\s]/g, '').
+    split(/\s+/).
+    filter((word) =>
+    word.length > 3 &&
+    !stopWords.has(word) &&
+    !/^\d+$/.test(word)
+    );
 
     // Count word frequency
     const wordCount = words.reduce((acc, word) => {
@@ -293,10 +293,10 @@ const RealTimeTranscriber: React.FC<RealTimeTranscriberProps> = ({
     }, {} as Record<string, number>);
 
     // Sort by frequency and return top keywords
-    return Object.entries(wordCount)
-      .sort(([,a], [,b]) => b - a)
-      .slice(0, 5)
-      .map(([word]) => word);
+    return Object.entries(wordCount).
+    sort(([, a], [, b]) => b - a).
+    slice(0, 5).
+    map(([word]) => word);
   };
 
   const analyzeEmotion = (text: string): string => {
@@ -313,7 +313,7 @@ const RealTimeTranscriber: React.FC<RealTimeTranscriberProps> = ({
       neutral: 0
     };
 
-    words.forEach(word => {
+    words.forEach((word) => {
       Object.entries(emotionKeywords).forEach(([emotion, keywords]) => {
         if (keywords.includes(word)) {
           scores[emotion as keyof typeof scores]++;
@@ -330,33 +330,33 @@ const RealTimeTranscriber: React.FC<RealTimeTranscriberProps> = ({
   const calculateSpeakingPace = (text: string): number => {
     const wordCount = text.split(/\s+/).length;
     const timeWindow = 10; // seconds
-    return Math.round((wordCount / timeWindow) * 60);
+    return Math.round(wordCount / timeWindow * 60);
   };
 
   const checkVoiceCommands = (text: string) => {
     const allCommands = [
-      ...voiceCommands.navigation,
-      ...voiceCommands.control,
-      ...voiceCommands.generation
-    ];
+    ...voiceCommands.navigation,
+    ...voiceCommands.control,
+    ...voiceCommands.generation];
+
 
     for (const { pattern, command } of allCommands) {
       const match = text.match(pattern);
       if (match) {
         console.log('Voice command detected:', command);
-        
+
         let commandData = command;
         if (command === 'goto' && match[1]) {
           commandData = `goto_${match[1]}`;
         }
-        
+
         onVoiceCommand(commandData);
-        
+
         toast({
           title: "Voice Command Detected",
-          description: `Executing: ${command.replace('_', ' ')}`,
+          description: `Executing: ${command.replace('_', ' ')}`
         });
-        
+
         break;
       }
     }
@@ -368,17 +368,17 @@ const RealTimeTranscriber: React.FC<RealTimeTranscriberProps> = ({
         recognitionRef.current.start();
         setIsRecording(true);
         startAudioLevelMonitoring();
-        
+
         toast({
           title: "Recording Started",
-          description: "Real-time transcription and analysis active.",
+          description: "Real-time transcription and analysis active."
         });
       } catch (error) {
         console.error('Error starting recording:', error);
         toast({
           title: "Recording Error",
           description: "Failed to start speech recognition.",
-          variant: "destructive",
+          variant: "destructive"
         });
       }
     }
@@ -389,14 +389,14 @@ const RealTimeTranscriber: React.FC<RealTimeTranscriberProps> = ({
       recognitionRef.current.stop();
       setIsRecording(false);
       setIsListening(false);
-      
+
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }
-      
+
       toast({
         title: "Recording Stopped",
-        description: "Transcription data has been saved.",
+        description: "Transcription data has been saved."
       });
     }
   };
@@ -405,11 +405,11 @@ const RealTimeTranscriber: React.FC<RealTimeTranscriberProps> = ({
     if (recognitionRef.current) {
       recognitionRef.current.stop();
     }
-    
+
     if (audioContextRef.current) {
       audioContextRef.current.close();
     }
-    
+
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
     }
@@ -417,9 +417,9 @@ const RealTimeTranscriber: React.FC<RealTimeTranscriberProps> = ({
 
   const getEmotionColor = (emotion: string): string => {
     switch (emotion) {
-      case 'positive': return 'text-green-600';
-      case 'negative': return 'text-red-600';
-      default: return 'text-gray-600';
+      case 'positive':return 'text-green-600';
+      case 'negative':return 'text-red-600';
+      default:return 'text-gray-600';
     }
   };
 
@@ -445,20 +445,20 @@ const RealTimeTranscriber: React.FC<RealTimeTranscriberProps> = ({
               onClick={isRecording ? stopRecording : startRecording}
               variant={isRecording ? "destructive" : "default"}
               className="flex items-center gap-2"
-              disabled={!isActive}
-            >
+              disabled={!isActive}>
+
               {isRecording ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
               {isRecording ? 'Stop Recording' : 'Start Recording'}
             </Button>
 
-            {isRecording && (
-              <>
+            {isRecording &&
+            <>
                 <div className="flex items-center gap-2">
-                  {isListening ? (
-                    <Volume2 className="h-4 w-4 text-green-500" />
-                  ) : (
-                    <VolumeX className="h-4 w-4 text-gray-400" />
-                  )}
+                  {isListening ?
+                <Volume2 className="h-4 w-4 text-green-500" /> :
+
+                <VolumeX className="h-4 w-4 text-gray-400" />
+                }
                   <div className={`w-2 h-2 rounded-full ${isListening ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`}></div>
                 </div>
 
@@ -468,14 +468,14 @@ const RealTimeTranscriber: React.FC<RealTimeTranscriberProps> = ({
                   <span className="text-xs">{Math.round(audioLevel)}%</span>
                 </div>
               </>
-            )}
+            }
           </div>
         </CardContent>
       </Card>
 
       {/* Analytics Panel */}
-      {isRecording && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {isRecording &&
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center gap-2">
@@ -521,7 +521,7 @@ const RealTimeTranscriber: React.FC<RealTimeTranscriberProps> = ({
             </CardContent>
           </Card>
         </div>
-      )}
+      }
 
       {/* Live Transcription */}
       <Card>
@@ -529,22 +529,22 @@ const RealTimeTranscriber: React.FC<RealTimeTranscriberProps> = ({
           <CardTitle>Live Transcription</CardTitle>
         </CardHeader>
         <CardContent>
-          {currentText && (
-            <div className="mb-4 p-3 bg-blue-50 rounded-lg border">
+          {currentText &&
+          <div className="mb-4 p-3 bg-blue-50 rounded-lg border">
               <p className="text-sm text-blue-800 font-medium">Current Speech:</p>
               <p className="text-blue-900">{currentText}</p>
             </div>
-          )}
+          }
 
           <ScrollArea className="h-48 w-full border rounded-lg p-4">
-            {transcriptions.length === 0 ? (
-              <p className="text-gray-500 text-center">
+            {transcriptions.length === 0 ?
+            <p className="text-gray-500 text-center">
                 {isRecording ? 'Listening for speech...' : 'Start recording to see transcription'}
-              </p>
-            ) : (
-              <div className="space-y-3">
-                {transcriptions.slice(-10).map((transcription) => (
-                  <div key={transcription.id} className="border-b pb-2">
+              </p> :
+
+            <div className="space-y-3">
+                {transcriptions.slice(-10).map((transcription) =>
+              <div key={transcription.id} className="border-b pb-2">
                     <div className="flex items-center gap-2 mb-1">
                       <Badge variant="outline" size="sm">
                         Slide {transcription.slideNumber}
@@ -562,19 +562,19 @@ const RealTimeTranscriber: React.FC<RealTimeTranscriberProps> = ({
                     
                     <p className="text-sm text-gray-800 mb-1">{transcription.text}</p>
                     
-                    {transcription.keywords.length > 0 && (
-                      <div className="flex flex-wrap gap-1">
-                        {transcription.keywords.map((keyword, i) => (
-                          <Badge key={i} variant="secondary" size="sm">
+                    {transcription.keywords.length > 0 &&
+                <div className="flex flex-wrap gap-1">
+                        {transcription.keywords.map((keyword, i) =>
+                  <Badge key={i} variant="secondary" size="sm">
                             {keyword}
                           </Badge>
-                        ))}
+                  )}
                       </div>
-                    )}
+                }
                   </div>
-                ))}
+              )}
               </div>
-            )}
+            }
           </ScrollArea>
         </CardContent>
       </Card>
@@ -619,8 +619,8 @@ const RealTimeTranscriber: React.FC<RealTimeTranscriberProps> = ({
           </div>
         </CardContent>
       </Card>
-    </div>
-  );
+    </div>);
+
 };
 
 export default RealTimeTranscriber;

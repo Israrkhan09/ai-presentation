@@ -5,18 +5,18 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { 
-  FileText, 
-  Download, 
-  RefreshCw, 
+import {
+  FileText,
+  Download,
+  RefreshCw,
   Eye,
   Clock,
   BarChart3,
   Target,
   Brain,
   CheckCircle,
-  TrendingUp
-} from 'lucide-react';
+  TrendingUp } from
+'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface SessionSummary {
@@ -78,7 +78,7 @@ const PDFSummaryGenerator: React.FC<PDFSummaryGeneratorProps> = ({
       toast({
         title: "Cannot Generate Summary",
         description: "Need active session with transcription data.",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
@@ -88,10 +88,10 @@ const PDFSummaryGenerator: React.FC<PDFSummaryGeneratorProps> = ({
     try {
       // Analyze transcription data
       const analysis = analyzeTranscriptionData();
-      
+
       // Get session data
       const sessionData = await getSessionData();
-      
+
       // Get quiz data
       const quizData = await getQuizData();
 
@@ -110,7 +110,7 @@ const PDFSummaryGenerator: React.FC<PDFSummaryGeneratorProps> = ({
       };
 
       setCurrentSummary(summary);
-      setGeneratedSummaries(prev => [...prev, summary]);
+      setGeneratedSummaries((prev) => [...prev, summary]);
 
       if (onSummaryGenerated) {
         onSummaryGenerated(summary);
@@ -118,7 +118,7 @@ const PDFSummaryGenerator: React.FC<PDFSummaryGeneratorProps> = ({
 
       toast({
         title: "Summary Generated",
-        description: "Comprehensive presentation summary is ready.",
+        description: "Comprehensive presentation summary is ready."
       });
 
     } catch (error) {
@@ -126,7 +126,7 @@ const PDFSummaryGenerator: React.FC<PDFSummaryGeneratorProps> = ({
       toast({
         title: "Generation Failed",
         description: "Failed to generate presentation summary.",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setIsGenerating(false);
@@ -134,11 +134,11 @@ const PDFSummaryGenerator: React.FC<PDFSummaryGeneratorProps> = ({
   };
 
   const analyzeTranscriptionData = () => {
-    const totalWords = transcriptionData.reduce((sum, segment) => 
-      sum + segment.text.split(/\s+/).length, 0
+    const totalWords = transcriptionData.reduce((sum, segment) =>
+    sum + segment.text.split(/\s+/).length, 0
     );
 
-    const confidenceScores = transcriptionData.map(segment => segment.confidence);
+    const confidenceScores = transcriptionData.map((segment) => segment.confidence);
     const averageConfidence = confidenceScores.reduce((sum, score) => sum + score, 0) / confidenceScores.length;
 
     const emotions = transcriptionData.reduce((acc, segment) => {
@@ -147,10 +147,10 @@ const PDFSummaryGenerator: React.FC<PDFSummaryGeneratorProps> = ({
       return acc;
     }, {} as Record<string, number>);
 
-    const speakingPaces = transcriptionData.map(segment => segment.speakingPace || 150);
+    const speakingPaces = transcriptionData.map((segment) => segment.speakingPace || 150);
     const averagePace = speakingPaces.reduce((sum, pace) => sum + pace, 0) / speakingPaces.length;
 
-    const keyTopics = [...new Set(transcriptionData.flatMap(segment => segment.keywords || []))].slice(0, 10);
+    const keyTopics = [...new Set(transcriptionData.flatMap((segment) => segment.keywords || []))].slice(0, 10);
 
     const engagementScore = calculateEngagementScore(averageConfidence, keyTopics.length, averagePace);
 
@@ -179,7 +179,7 @@ const PDFSummaryGenerator: React.FC<PDFSummaryGeneratorProps> = ({
     // Calculate engagement based on multiple factors
     const confidenceScore = confidence * 30;
     const keywordScore = Math.min(keywordCount * 5, 30);
-    const paceScore = (pace >= 120 && pace <= 180) ? 25 : 15; // Optimal speaking pace
+    const paceScore = pace >= 120 && pace <= 180 ? 25 : 15; // Optimal speaking pace
     const durationScore = Math.min(sessionDuration / 60 * 2, 15); // Up to 15 points for duration
 
     return Math.min(100, confidenceScore + keywordScore + paceScore + durationScore);
@@ -191,8 +191,8 @@ const PDFSummaryGenerator: React.FC<PDFSummaryGeneratorProps> = ({
         PageNo: 1,
         PageSize: 1,
         Filters: [
-          { name: 'ID', op: 'Equal', value: sessionId }
-        ]
+        { name: 'ID', op: 'Equal', value: sessionId }]
+
       });
 
       if (error) throw error;
@@ -209,8 +209,8 @@ const PDFSummaryGenerator: React.FC<PDFSummaryGeneratorProps> = ({
         PageNo: 1,
         PageSize: 10,
         Filters: [
-          { name: 'session_id', op: 'Equal', value: sessionId }
-        ]
+        { name: 'session_id', op: 'Equal', value: sessionId }]
+
       });
 
       if (error) throw error;
@@ -225,29 +225,29 @@ const PDFSummaryGenerator: React.FC<PDFSummaryGeneratorProps> = ({
     try {
       // Create HTML content for PDF
       const htmlContent = generatePDFHTML(summary);
-      
+
       // In a real implementation, you'd use a PDF library like jsPDF or send to server
       // For now, we'll create a downloadable HTML file
       const blob = new Blob([htmlContent], { type: 'text/html' });
       const url = URL.createObjectURL(blob);
-      
+
       const a = document.createElement('a');
       a.href = url;
       a.download = `presentation-summary-${summary.sessionId}-${Date.now()}.html`;
       a.click();
-      
+
       URL.revokeObjectURL(url);
-      
+
       toast({
         title: "PDF Generated",
-        description: "Summary downloaded successfully.",
+        description: "Summary downloaded successfully."
       });
     } catch (error) {
       console.error('Error generating PDF:', error);
       toast({
         title: "Download Failed",
         description: "Failed to generate PDF summary.",
-        variant: "destructive",
+        variant: "destructive"
       });
     }
   };
@@ -315,7 +315,7 @@ const PDFSummaryGenerator: React.FC<PDFSummaryGeneratorProps> = ({
     <div class="section">
         <h2>Key Topics</h2>
         <div class="keywords">
-            ${summary.keyTopics.map(topic => `<span class="keyword">${topic}</span>`).join('')}
+            ${summary.keyTopics.map((topic) => `<span class="keyword">${topic}</span>`).join('')}
         </div>
     </div>
 
@@ -333,7 +333,7 @@ const PDFSummaryGenerator: React.FC<PDFSummaryGeneratorProps> = ({
 
     <div class="section">
         <h2>Presentation Timeline</h2>
-        ${summary.transcriptSegments.slice(0, 20).map(segment => `
+        ${summary.transcriptSegments.slice(0, 20).map((segment) => `
             <div class="transcript">
                 <div class="timestamp">Slide ${segment.slide} - ${new Date(segment.timestamp).toLocaleTimeString()}</div>
                 <p>${segment.text}</p>
@@ -358,7 +358,7 @@ const PDFSummaryGenerator: React.FC<PDFSummaryGeneratorProps> = ({
                 </tr>
             </thead>
             <tbody>
-                ${summary.quizzes.map(quiz => `
+                ${summary.quizzes.map((quiz) => `
                     <tr>
                         <td>${quiz.quiz_type}</td>
                         <td>${quiz.total_questions}</td>
@@ -373,7 +373,7 @@ const PDFSummaryGenerator: React.FC<PDFSummaryGeneratorProps> = ({
     <div class="section">
         <h2>Recommendations</h2>
         <ul>
-            ${generateRecommendations(summary).map(rec => `<li>${rec}</li>`).join('')}
+            ${generateRecommendations(summary).map((rec) => `<li>${rec}</li>`).join('')}
         </ul>
     </div>
 </body>
@@ -398,7 +398,7 @@ const PDFSummaryGenerator: React.FC<PDFSummaryGeneratorProps> = ({
       recommendations.push("Consider covering more diverse topics to enrich the presentation content");
     }
 
-    if (summary.duration < 300) { // Less than 5 minutes
+    if (summary.duration < 300) {// Less than 5 minutes
       recommendations.push("Consider expanding the presentation content for more comprehensive coverage");
     }
 
@@ -415,9 +415,9 @@ const PDFSummaryGenerator: React.FC<PDFSummaryGeneratorProps> = ({
 
   const formatDuration = (seconds: number): string => {
     const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
+    const minutes = Math.floor(seconds % 3600 / 60);
     const secs = seconds % 60;
-    
+
     if (hours > 0) {
       return `${hours}h ${minutes}m ${secs}s`;
     }
@@ -445,13 +445,13 @@ const PDFSummaryGenerator: React.FC<PDFSummaryGeneratorProps> = ({
             <Button
               onClick={generateSummary}
               disabled={isGenerating || !sessionId || transcriptionData.length === 0}
-              className="w-full h-12 flex items-center gap-2"
-            >
-              {isGenerating ? (
-                <RefreshCw className="h-4 w-4 animate-spin" />
-              ) : (
-                <Brain className="h-4 w-4" />
-              )}
+              className="w-full h-12 flex items-center gap-2">
+
+              {isGenerating ?
+              <RefreshCw className="h-4 w-4 animate-spin" /> :
+
+              <Brain className="h-4 w-4" />
+              }
               Generate Comprehensive Summary
             </Button>
 
@@ -478,24 +478,24 @@ const PDFSummaryGenerator: React.FC<PDFSummaryGeneratorProps> = ({
       </Card>
 
       {/* Current Summary Preview */}
-      {currentSummary && (
-        <Card>
+      {currentSummary &&
+      <Card>
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <span>Generated Summary</span>
               <div className="flex gap-2">
                 <Button
-                  onClick={() => setShowPreview(!showPreview)}
-                  variant="outline"
-                  size="sm"
-                >
+                onClick={() => setShowPreview(!showPreview)}
+                variant="outline"
+                size="sm">
+
                   <Eye className="h-4 w-4 mr-2" />
                   {showPreview ? 'Hide' : 'Show'} Preview
                 </Button>
                 <Button
-                  onClick={() => generatePDF(currentSummary)}
-                  size="sm"
-                >
+                onClick={() => generatePDF(currentSummary)}
+                size="sm">
+
                   <Download className="h-4 w-4 mr-2" />
                   Download PDF
                 </Button>
@@ -528,8 +528,8 @@ const PDFSummaryGenerator: React.FC<PDFSummaryGeneratorProps> = ({
               </div>
             </div>
 
-            {showPreview && (
-              <div className="space-y-6">
+            {showPreview &&
+          <div className="space-y-6">
                 <Separator />
                 
                 {/* Key Topics */}
@@ -539,11 +539,11 @@ const PDFSummaryGenerator: React.FC<PDFSummaryGeneratorProps> = ({
                     Key Topics Covered
                   </h4>
                   <div className="flex flex-wrap gap-2">
-                    {currentSummary.keyTopics.map((topic, index) => (
-                      <Badge key={index} variant="secondary">
+                    {currentSummary.keyTopics.map((topic, index) =>
+                <Badge key={index} variant="secondary">
                         {topic}
                       </Badge>
-                    ))}
+                )}
                   </div>
                 </div>
 
@@ -554,12 +554,12 @@ const PDFSummaryGenerator: React.FC<PDFSummaryGeneratorProps> = ({
                     Emotional Tone Analysis
                   </h4>
                   <div className="grid grid-cols-3 gap-4">
-                    {Object.entries(currentSummary.emotionAnalysis).map(([emotion, count]) => (
-                      <div key={emotion} className="text-center">
+                    {Object.entries(currentSummary.emotionAnalysis).map(([emotion, count]) =>
+                <div key={emotion} className="text-center">
                         <div className="text-lg font-bold">{count as number}</div>
                         <p className="text-sm text-gray-600 capitalize">{emotion}</p>
                       </div>
-                    ))}
+                )}
                   </div>
                 </div>
 
@@ -571,8 +571,8 @@ const PDFSummaryGenerator: React.FC<PDFSummaryGeneratorProps> = ({
                   </h4>
                   <ScrollArea className="h-48 border rounded-lg p-4">
                     <div className="space-y-3">
-                      {currentSummary.transcriptSegments.slice(-5).map((segment, index) => (
-                        <div key={segment.id} className="border-b pb-2">
+                      {currentSummary.transcriptSegments.slice(-5).map((segment, index) =>
+                  <div key={segment.id} className="border-b pb-2">
                           <div className="flex items-center gap-2 mb-1">
                             <Badge variant="outline" size="sm">
                               Slide {segment.slide}
@@ -582,17 +582,17 @@ const PDFSummaryGenerator: React.FC<PDFSummaryGeneratorProps> = ({
                             </span>
                           </div>
                           <p className="text-sm">{segment.text}</p>
-                          {segment.keywords.length > 0 && (
-                            <div className="flex gap-1 mt-1">
-                              {segment.keywords.map((keyword: string, i: number) => (
-                                <Badge key={i} variant="secondary" size="sm">
+                          {segment.keywords.length > 0 &&
+                    <div className="flex gap-1 mt-1">
+                              {segment.keywords.map((keyword: string, i: number) =>
+                      <Badge key={i} variant="secondary" size="sm">
                                   {keyword}
                                 </Badge>
-                              ))}
+                      )}
                             </div>
-                          )}
+                    }
                         </div>
-                      ))}
+                  )}
                     </div>
                   </ScrollArea>
                 </div>
@@ -604,30 +604,30 @@ const PDFSummaryGenerator: React.FC<PDFSummaryGeneratorProps> = ({
                     Recommendations
                   </h4>
                   <ul className="space-y-1 text-sm text-gray-700">
-                    {generateRecommendations(currentSummary).map((recommendation, index) => (
-                      <li key={index} className="flex items-start gap-2">
+                    {generateRecommendations(currentSummary).map((recommendation, index) =>
+                <li key={index} className="flex items-start gap-2">
                         <span className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></span>
                         {recommendation}
                       </li>
-                    ))}
+                )}
                   </ul>
                 </div>
               </div>
-            )}
+          }
           </CardContent>
         </Card>
-      )}
+      }
 
       {/* Summary History */}
-      {generatedSummaries.length > 1 && (
-        <Card>
+      {generatedSummaries.length > 1 &&
+      <Card>
           <CardHeader>
             <CardTitle>Previous Summaries</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {generatedSummaries.slice(0, -1).map((summary, index) => (
-                <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+              {generatedSummaries.slice(0, -1).map((summary, index) =>
+            <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
                   <div>
                     <p className="font-medium">{summary.title}</p>
                     <p className="text-sm text-gray-600">
@@ -635,20 +635,20 @@ const PDFSummaryGenerator: React.FC<PDFSummaryGeneratorProps> = ({
                     </p>
                   </div>
                   <Button
-                    onClick={() => generatePDF(summary)}
-                    variant="outline"
-                    size="sm"
-                  >
+                onClick={() => generatePDF(summary)}
+                variant="outline"
+                size="sm">
+
                     <Download className="h-4 w-4" />
                   </Button>
                 </div>
-              ))}
+            )}
             </div>
           </CardContent>
         </Card>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 };
 
 export default PDFSummaryGenerator;

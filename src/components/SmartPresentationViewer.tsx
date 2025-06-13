@@ -5,21 +5,21 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { 
-  Play, 
-  Pause, 
-  Square, 
-  ChevronLeft, 
-  ChevronRight, 
-  Mic, 
+import {
+  Play,
+  Pause,
+  Square,
+  ChevronLeft,
+  ChevronRight,
+  Mic,
   MicOff,
   FileText,
   Download,
   Brain,
   Target,
   Clock,
-  Volume2
-} from 'lucide-react';
+  Volume2 } from
+'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface SmartPresentationViewerProps {
@@ -83,7 +83,7 @@ const SmartPresentationViewer: React.FC<SmartPresentationViewerProps> = ({
           toast({
             title: "Microphone Access Denied",
             description: "Please allow microphone access for transcription features.",
-            variant: "destructive",
+            variant: "destructive"
           });
         }
       };
@@ -110,7 +110,7 @@ const SmartPresentationViewer: React.FC<SmartPresentationViewerProps> = ({
       confidence
     };
 
-    setTranscription(prev => [...prev, segment]);
+    setTranscription((prev) => [...prev, segment]);
     setCurrentKeywords(keywords);
 
     // Store transcription in database
@@ -147,9 +147,9 @@ const SmartPresentationViewer: React.FC<SmartPresentationViewerProps> = ({
   const extractKeywords = (text: string): string[] => {
     // Simple keyword extraction - in production, use more sophisticated NLP
     const words = text.toLowerCase().split(/\s+/);
-    const keywords = words.filter(word => 
-      word.length > 4 && 
-      !['the', 'and', 'for', 'are', 'but', 'not', 'you', 'all', 'can', 'had', 'her', 'was', 'one', 'our', 'out', 'day', 'get', 'has', 'him', 'his', 'how', 'its', 'may', 'new', 'now', 'old', 'see', 'two', 'way', 'who', 'boy', 'did', 'has', 'let', 'put', 'say', 'she', 'too', 'use'].includes(word)
+    const keywords = words.filter((word) =>
+    word.length > 4 &&
+    !['the', 'and', 'for', 'are', 'but', 'not', 'you', 'all', 'can', 'had', 'her', 'was', 'one', 'our', 'out', 'day', 'get', 'has', 'him', 'his', 'how', 'its', 'may', 'new', 'now', 'old', 'see', 'two', 'way', 'who', 'boy', 'did', 'has', 'let', 'put', 'say', 'she', 'too', 'use'].includes(word)
     );
     return [...new Set(keywords)].slice(0, 5); // Top 5 unique keywords
   };
@@ -158,11 +158,11 @@ const SmartPresentationViewer: React.FC<SmartPresentationViewerProps> = ({
     // Simple emotion analysis - in production, use ML models
     const positiveWords = ['great', 'excellent', 'amazing', 'wonderful', 'good', 'best'];
     const negativeWords = ['bad', 'terrible', 'awful', 'worst', 'difficult', 'problem'];
-    
+
     const words = text.toLowerCase().split(/\s+/);
-    const positiveCount = words.filter(word => positiveWords.includes(word)).length;
-    const negativeCount = words.filter(word => negativeWords.includes(word)).length;
-    
+    const positiveCount = words.filter((word) => positiveWords.includes(word)).length;
+    const negativeCount = words.filter((word) => negativeWords.includes(word)).length;
+
     if (positiveCount > negativeCount) return 'positive';
     if (negativeCount > positiveCount) return 'negative';
     return 'neutral';
@@ -172,14 +172,14 @@ const SmartPresentationViewer: React.FC<SmartPresentationViewerProps> = ({
     // Estimate words per minute based on recent transcription
     const wordCount = text.split(/\s+/).length;
     const timeWindow = 60; // seconds
-    return (wordCount / timeWindow) * 60;
+    return wordCount / timeWindow * 60;
   };
 
   const shouldAdvanceSlide = (text: string, keywords: string[]): boolean => {
     // Logic to determine if slide should advance based on content
     const transitionPhrases = ['next slide', 'moving on', 'let\'s continue', 'in conclusion'];
-    const hasTransitionPhrase = transitionPhrases.some(phrase => 
-      text.toLowerCase().includes(phrase)
+    const hasTransitionPhrase = transitionPhrases.some((phrase) =>
+    text.toLowerCase().includes(phrase)
     );
     return hasTransitionPhrase;
   };
@@ -218,10 +218,10 @@ const SmartPresentationViewer: React.FC<SmartPresentationViewerProps> = ({
       setSessionId(data);
       setIsPresenting(true);
       sessionStartTime.current = new Date();
-      
+
       // Start duration timer
       intervalRef.current = setInterval(() => {
-        setSessionDuration(prev => prev + 1);
+        setSessionDuration((prev) => prev + 1);
       }, 1000);
 
       // Load speaker notes
@@ -229,14 +229,14 @@ const SmartPresentationViewer: React.FC<SmartPresentationViewerProps> = ({
 
       toast({
         title: "Presentation Started",
-        description: "Real-time features are now active.",
+        description: "Real-time features are now active."
       });
     } catch (error) {
       console.error('Error starting presentation:', error);
       toast({
         title: "Error",
         description: "Failed to start presentation session.",
-        variant: "destructive",
+        variant: "destructive"
       });
     }
   };
@@ -256,7 +256,7 @@ const SmartPresentationViewer: React.FC<SmartPresentationViewerProps> = ({
 
       setIsPresenting(false);
       stopRecording();
-      
+
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
@@ -267,7 +267,7 @@ const SmartPresentationViewer: React.FC<SmartPresentationViewerProps> = ({
 
       toast({
         title: "Presentation Completed",
-        description: "Session data saved and materials generated.",
+        description: "Session data saved and materials generated."
       });
 
       if (onSessionEnd) {
@@ -289,7 +289,7 @@ const SmartPresentationViewer: React.FC<SmartPresentationViewerProps> = ({
       setIsRecording(true);
       toast({
         title: "Recording Started",
-        description: "Real-time transcription is now active.",
+        description: "Real-time transcription is now active."
       });
     }
   };
@@ -300,21 +300,21 @@ const SmartPresentationViewer: React.FC<SmartPresentationViewerProps> = ({
       setIsRecording(false);
       toast({
         title: "Recording Stopped",
-        description: "Transcription has been saved.",
+        description: "Transcription has been saved."
       });
     }
   };
 
   const handleNextSlide = () => {
     if (currentSlide < totalSlides) {
-      setCurrentSlide(prev => prev + 1);
+      setCurrentSlide((prev) => prev + 1);
       setCurrentKeywords([]);
     }
   };
 
   const handlePreviousSlide = () => {
     if (currentSlide > 1) {
-      setCurrentSlide(prev => prev - 1);
+      setCurrentSlide((prev) => prev - 1);
       setCurrentKeywords([]);
     }
   };
@@ -325,15 +325,15 @@ const SmartPresentationViewer: React.FC<SmartPresentationViewerProps> = ({
         PageNo: 1,
         PageSize: 100,
         Filters: [
-          { name: 'presentation_id', op: 'Equal', value: presentationId }
-        ]
+        { name: 'presentation_id', op: 'Equal', value: presentationId }]
+
       });
 
       if (error) throw error;
 
       if (data?.List) {
-        const notes = data.List.map((note: any) => 
-          `Slide ${note.slide_number}: ${JSON.parse(note.key_points || '[]').join(', ')}`
+        const notes = data.List.map((note: any) =>
+        `Slide ${note.slide_number}: ${JSON.parse(note.key_points || '[]').join(', ')}`
         );
         setSpeakerNotes(notes);
       }
@@ -347,8 +347,8 @@ const SmartPresentationViewer: React.FC<SmartPresentationViewerProps> = ({
       if (!sessionId) return;
 
       // Generate quiz based on transcription and keywords
-      const allKeywords = [...new Set(transcription.flatMap(t => t.keywords))];
-      
+      const allKeywords = [...new Set(transcription.flatMap((t) => t.keywords))];
+
       const { data: quizData, error: quizError } = await window.ezsite.apis.tableCreate('16753', {
         session_id: sessionId,
         quiz_title: `Quiz: Session ${new Date().toLocaleDateString()}`,
@@ -371,11 +371,11 @@ const SmartPresentationViewer: React.FC<SmartPresentationViewerProps> = ({
           question_text: `What is the significance of "${keyword}" in the presented content?`,
           question_type: 'MCQ',
           options: JSON.stringify([
-            `${keyword} is a primary concept`,
-            `${keyword} is a supporting detail`,
-            `${keyword} is an example`,
-            `${keyword} is not relevant`
-          ]),
+          `${keyword} is a primary concept`,
+          `${keyword} is a supporting detail`,
+          `${keyword} is an example`,
+          `${keyword} is not relevant`]
+          ),
           correct_answer: `${keyword} is a primary concept`,
           explanation: `Based on the frequency and context of "${keyword}" in the presentation.`,
           points: 1,
@@ -385,7 +385,7 @@ const SmartPresentationViewer: React.FC<SmartPresentationViewerProps> = ({
 
       toast({
         title: "Quiz Generated",
-        description: `Created ${Math.min(5, allKeywords.length)} questions based on your presentation.`,
+        description: `Created ${Math.min(5, allKeywords.length)} questions based on your presentation.`
       });
     } catch (error) {
       console.error('Error generating quiz:', error);
@@ -399,16 +399,16 @@ const SmartPresentationViewer: React.FC<SmartPresentationViewerProps> = ({
         sessionId,
         duration: sessionDuration,
         totalSlides: currentSlide,
-        keyTopics: [...new Set(transcription.flatMap(t => t.keywords))],
-        transcript: transcription.map(t => t.text).join(' '),
+        keyTopics: [...new Set(transcription.flatMap((t) => t.keywords))],
+        transcript: transcription.map((t) => t.text).join(' '),
         engagement: calculateEngagementScore()
       };
 
       console.log('Generated PDF summary:', summaryContent);
-      
+
       toast({
         title: "PDF Summary Generated",
-        description: "Presentation summary is ready for download.",
+        description: "Presentation summary is ready for download."
       });
     } catch (error) {
       console.error('Error generating PDF summary:', error);
@@ -418,18 +418,18 @@ const SmartPresentationViewer: React.FC<SmartPresentationViewerProps> = ({
   const calculateEngagementScore = (): number => {
     // Calculate engagement based on speaking pace, keywords, and duration
     const avgConfidence = transcription.reduce((sum, t) => sum + t.confidence, 0) / transcription.length;
-    const keywordDiversity = new Set(transcription.flatMap(t => t.keywords)).size;
+    const keywordDiversity = new Set(transcription.flatMap((t) => t.keywords)).size;
     const timePerSlide = sessionDuration / currentSlide;
-    
-    return Math.min(100, (avgConfidence * 30) + (keywordDiversity * 5) + (timePerSlide > 60 ? 30 : 20));
+
+    return Math.min(100, avgConfidence * 30 + keywordDiversity * 5 + (timePerSlide > 60 ? 30 : 20));
   };
 
   const showSpeakerNotes = () => {
-    const currentNotes = speakerNotes.find(note => note.startsWith(`Slide ${currentSlide}:`));
+    const currentNotes = speakerNotes.find((note) => note.startsWith(`Slide ${currentSlide}:`));
     if (currentNotes) {
       toast({
         title: `Speaker Notes - Slide ${currentSlide}`,
-        description: currentNotes,
+        description: currentNotes
       });
     }
   };
@@ -453,23 +453,23 @@ const SmartPresentationViewer: React.FC<SmartPresentationViewerProps> = ({
         <CardContent>
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex items-center gap-2">
-              {!isPresenting ? (
-                <Button onClick={startPresentation} className="flex items-center gap-2">
+              {!isPresenting ?
+              <Button onClick={startPresentation} className="flex items-center gap-2">
                   <Play className="h-4 w-4" />
                   Start Presentation
-                </Button>
-              ) : (
-                <Button onClick={stopPresentation} variant="destructive" className="flex items-center gap-2">
+                </Button> :
+
+              <Button onClick={stopPresentation} variant="destructive" className="flex items-center gap-2">
                   <Square className="h-4 w-4" />
                   End Presentation
                 </Button>
-              )}
+              }
               
               <Button
                 onClick={isRecording ? stopRecording : startRecording}
                 variant={isRecording ? "destructive" : "outline"}
-                className="flex items-center gap-2"
-              >
+                className="flex items-center gap-2">
+
                 {isRecording ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
                 {isRecording ? 'Stop' : 'Start'} Recording
               </Button>
@@ -482,8 +482,8 @@ const SmartPresentationViewer: React.FC<SmartPresentationViewerProps> = ({
                 onClick={handlePreviousSlide}
                 variant="outline"
                 size="sm"
-                disabled={currentSlide <= 1}
-              >
+                disabled={currentSlide <= 1}>
+
                 <ChevronLeft className="h-4 w-4" />
               </Button>
               
@@ -495,8 +495,8 @@ const SmartPresentationViewer: React.FC<SmartPresentationViewerProps> = ({
                 onClick={handleNextSlide}
                 variant="outline"
                 size="sm"
-                disabled={currentSlide >= totalSlides}
-              >
+                disabled={currentSlide >= totalSlides}>
+
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
@@ -509,17 +509,17 @@ const SmartPresentationViewer: React.FC<SmartPresentationViewerProps> = ({
                 <span className="text-sm font-mono">{formatDuration(sessionDuration)}</span>
               </div>
               
-              {isRecording && (
-                <div className="flex items-center gap-2">
+              {isRecording &&
+              <div className="flex items-center gap-2">
                   <Volume2 className="h-4 w-4 text-green-500" />
                   <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                 </div>
-              )}
+              }
             </div>
           </div>
 
           <div className="mt-4">
-            <Progress value={(currentSlide / totalSlides) * 100} className="w-full" />
+            <Progress value={currentSlide / totalSlides * 100} className="w-full" />
           </div>
         </CardContent>
       </Card>
@@ -539,19 +539,19 @@ const SmartPresentationViewer: React.FC<SmartPresentationViewerProps> = ({
             </div>
             
             {/* Current Keywords */}
-            {currentKeywords.length > 0 && (
-              <div className="mt-4">
+            {currentKeywords.length > 0 &&
+            <div className="mt-4">
                 <h4 className="text-sm font-medium mb-2">Current Keywords:</h4>
                 <div className="flex flex-wrap gap-2">
-                  {currentKeywords.map((keyword, index) => (
-                    <Badge key={index} variant="outline" className="bg-blue-50">
+                  {currentKeywords.map((keyword, index) =>
+                <Badge key={index} variant="outline" className="bg-blue-50">
                       <Target className="h-3 w-3 mr-1" />
                       {keyword}
                     </Badge>
-                  ))}
+                )}
                 </div>
               </div>
-            )}
+            }
           </CardContent>
         </Card>
 
@@ -565,12 +565,12 @@ const SmartPresentationViewer: React.FC<SmartPresentationViewerProps> = ({
           </CardHeader>
           <CardContent>
             <ScrollArea className="h-64 w-full border rounded-lg p-4">
-              {transcription.length === 0 ? (
-                <p className="text-gray-500 text-center">Start recording to see live transcription...</p>
-              ) : (
-                <div className="space-y-2">
-                  {transcription.slice(-10).map((segment, index) => (
-                    <div key={index} className="text-sm">
+              {transcription.length === 0 ?
+              <p className="text-gray-500 text-center">Start recording to see live transcription...</p> :
+
+              <div className="space-y-2">
+                  {transcription.slice(-10).map((segment, index) =>
+                <div key={index} className="text-sm">
                       <div className="flex items-center gap-2 mb-1">
                         <Badge variant="outline" size="sm">
                           {Math.floor(segment.confidence * 100)}% confident
@@ -580,19 +580,19 @@ const SmartPresentationViewer: React.FC<SmartPresentationViewerProps> = ({
                         </span>
                       </div>
                       <p className="text-gray-800">{segment.text}</p>
-                      {segment.keywords.length > 0 && (
-                        <div className="flex gap-1 mt-1">
-                          {segment.keywords.map((keyword, i) => (
-                            <Badge key={i} variant="secondary" size="sm">
+                      {segment.keywords.length > 0 &&
+                  <div className="flex gap-1 mt-1">
+                          {segment.keywords.map((keyword, i) =>
+                    <Badge key={i} variant="secondary" size="sm">
                               {keyword}
                             </Badge>
-                          ))}
+                    )}
                         </div>
-                      )}
+                  }
                     </div>
-                  ))}
+                )}
                 </div>
-              )}
+              }
             </ScrollArea>
 
             <div className="mt-4 space-y-2">
@@ -601,8 +601,8 @@ const SmartPresentationViewer: React.FC<SmartPresentationViewerProps> = ({
                 variant="outline"
                 size="sm"
                 className="w-full"
-                disabled={!sessionId}
-              >
+                disabled={!sessionId}>
+
                 Generate Quiz
               </Button>
               <Button
@@ -610,8 +610,8 @@ const SmartPresentationViewer: React.FC<SmartPresentationViewerProps> = ({
                 variant="outline"
                 size="sm"
                 className="w-full"
-                disabled={!sessionId}
-              >
+                disabled={!sessionId}>
+
                 <Download className="h-4 w-4 mr-2" />
                 Download Summary
               </Button>
@@ -646,8 +646,8 @@ const SmartPresentationViewer: React.FC<SmartPresentationViewerProps> = ({
           </div>
         </CardContent>
       </Card>
-    </div>
-  );
+    </div>);
+
 };
 
 export default SmartPresentationViewer;

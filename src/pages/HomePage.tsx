@@ -2,80 +2,80 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Brain, 
-  Mic, 
-  FileText, 
-  Download, 
-  Zap, 
+import {
+  Brain,
+  Mic,
+  FileText,
+  Download,
+  Zap,
   Target,
   TrendingUp,
   CheckCircle,
   ArrowRight,
   Play,
-  BarChart3
-} from 'lucide-react';
+  BarChart3 } from
+'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
 
   const features = [
-    {
-      icon: <Mic className="h-8 w-8 text-blue-600" />,
-      title: "Real-time Transcription",
-      description: "Advanced speech-to-text with keyword detection and emotion analysis",
-      benefits: ["99% accuracy", "Live keyword highlighting", "Emotion tone detection"]
-    },
-    {
-      icon: <Brain className="h-8 w-8 text-purple-600" />,
-      title: "Smart Slide Control",
-      description: "Automatic slide advancement based on content context and voice commands",
-      benefits: ["Context-aware navigation", "Voice commands", "Hands-free operation"]
-    },
-    {
-      icon: <FileText className="h-8 w-8 text-green-600" />,
-      title: "AI Quiz Generation",
-      description: "Automatically create MCQ and theory-based assessments from your content",
-      benefits: ["Multiple question types", "Difficulty adaptation", "Instant feedback"]
-    },
-    {
-      icon: <Download className="h-8 w-8 text-orange-600" />,
-      title: "PDF Documentation",
-      description: "Generate comprehensive lecture summaries with analytics and insights",
-      benefits: ["Automated summaries", "Performance analytics", "Downloadable reports"]
-    }
-  ];
+  {
+    icon: <Mic className="h-8 w-8 text-blue-600" />,
+    title: "Real-time Transcription",
+    description: "Advanced speech-to-text with keyword detection and emotion analysis",
+    benefits: ["99% accuracy", "Live keyword highlighting", "Emotion tone detection"]
+  },
+  {
+    icon: <Brain className="h-8 w-8 text-purple-600" />,
+    title: "Smart Slide Control",
+    description: "Automatic slide advancement based on content context and voice commands",
+    benefits: ["Context-aware navigation", "Voice commands", "Hands-free operation"]
+  },
+  {
+    icon: <FileText className="h-8 w-8 text-green-600" />,
+    title: "AI Quiz Generation",
+    description: "Automatically create MCQ and theory-based assessments from your content",
+    benefits: ["Multiple question types", "Difficulty adaptation", "Instant feedback"]
+  },
+  {
+    icon: <Download className="h-8 w-8 text-orange-600" />,
+    title: "PDF Documentation",
+    description: "Generate comprehensive lecture summaries with analytics and insights",
+    benefits: ["Automated summaries", "Performance analytics", "Downloadable reports"]
+  }];
+
 
   const benefits = [
-    {
-      icon: <Target className="h-6 w-6 text-blue-500" />,
-      title: "Maximized Knowledge Retention",
-      description: "AI-powered content analysis ensures key concepts are reinforced through dynamic highlighting and automated assessments."
-    },
-    {
-      icon: <Zap className="h-6 w-6 text-yellow-500" />,
-      title: "Minimal Manual Intervention",
-      description: "Voice-activated controls and automatic slide advancement let you focus entirely on your presentation content."
-    },
-    {
-      icon: <TrendingUp className="h-6 w-6 text-green-500" />,
-      title: "Real-time Analytics",
-      description: "Live engagement metrics, speaking pace analysis, and audience interaction insights improve your presentation skills."
-    },
-    {
-      icon: <CheckCircle className="h-6 w-6 text-purple-500" />,
-      title: "Automated Documentation",
-      description: "Every session generates comprehensive materials including transcripts, summaries, and assessment tools."
-    }
-  ];
+  {
+    icon: <Target className="h-6 w-6 text-blue-500" />,
+    title: "Maximized Knowledge Retention",
+    description: "AI-powered content analysis ensures key concepts are reinforced through dynamic highlighting and automated assessments."
+  },
+  {
+    icon: <Zap className="h-6 w-6 text-yellow-500" />,
+    title: "Minimal Manual Intervention",
+    description: "Voice-activated controls and automatic slide advancement let you focus entirely on your presentation content."
+  },
+  {
+    icon: <TrendingUp className="h-6 w-6 text-green-500" />,
+    title: "Real-time Analytics",
+    description: "Live engagement metrics, speaking pace analysis, and audience interaction insights improve your presentation skills."
+  },
+  {
+    icon: <CheckCircle className="h-6 w-6 text-purple-500" />,
+    title: "Automated Documentation",
+    description: "Every session generates comprehensive materials including transcripts, summaries, and assessment tools."
+  }];
+
 
   const stats = [
-    { value: "95%", label: "Knowledge Retention Increase", icon: <Brain className="h-5 w-5" /> },
-    { value: "80%", label: "Time Saved on Documentation", icon: <FileText className="h-5 w-5" /> },
-    { value: "100%", label: "Hands-free Operation", icon: <Mic className="h-5 w-5" /> },
-    { value: "50+", label: "Voice Commands Supported", icon: <Play className="h-5 w-5" /> }
-  ];
+  { value: "95%", label: "Knowledge Retention Increase", icon: <Brain className="h-5 w-5" /> },
+  { value: "80%", label: "Time Saved on Documentation", icon: <FileText className="h-5 w-5" /> },
+  { value: "100%", label: "Hands-free Operation", icon: <Mic className="h-5 w-5" /> },
+  { value: "50+", label: "Voice Commands Supported", icon: <Play className="h-5 w-5" /> }];
+
 
   return (
     <div className="min-h-screen">
@@ -105,8 +105,8 @@ const HomePage: React.FC = () => {
               <Button
                 onClick={() => navigate('/smart-presentation')}
                 size="lg"
-                className="bg-white text-blue-600 hover:bg-blue-50 text-lg px-8 py-4 h-auto"
-              >
+                className="bg-white text-blue-600 hover:bg-blue-50 text-lg px-8 py-4 h-auto">
+
                 <Play className="h-5 w-5 mr-2" />
                 Start Smart Presentation
                 <ArrowRight className="h-5 w-5 ml-2" />
@@ -116,8 +116,8 @@ const HomePage: React.FC = () => {
                 onClick={() => navigate('/register')}
                 variant="outline"
                 size="lg"
-                className="border-white text-white hover:bg-white hover:text-blue-600 text-lg px-8 py-4 h-auto"
-              >
+                className="border-white text-white hover:bg-white hover:text-blue-600 text-lg px-8 py-4 h-auto">
+
                 Get Started Free
               </Button>
             </div>
@@ -129,15 +129,15 @@ const HomePage: React.FC = () => {
       <section className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center">
+            {stats.map((stat, index) =>
+            <div key={index} className="text-center">
                 <div className="flex justify-center items-center gap-2 mb-2">
                   <div className="text-blue-600">{stat.icon}</div>
                   <div className="text-3xl md:text-4xl font-bold text-gray-900">{stat.value}</div>
                 </div>
                 <p className="text-gray-600 text-sm md:text-base">{stat.label}</p>
               </div>
-            ))}
+            )}
           </div>
         </div>
       </section>
@@ -156,8 +156,8 @@ const HomePage: React.FC = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {features.map((feature, index) => (
-              <Card key={index} className="group hover:shadow-xl transition-all duration-300 border-0 bg-white">
+            {features.map((feature, index) =>
+            <Card key={index} className="group hover:shadow-xl transition-all duration-300 border-0 bg-white">
                 <CardHeader className="pb-4">
                   <div className="flex items-center gap-4 mb-4">
                     <div className="p-3 rounded-xl bg-gray-50 group-hover:bg-blue-50 transition-colors">
@@ -169,16 +169,16 @@ const HomePage: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
-                    {feature.benefits.map((benefit, i) => (
-                      <div key={i} className="flex items-center gap-2">
+                    {feature.benefits.map((benefit, i) =>
+                  <div key={i} className="flex items-center gap-2">
                         <CheckCircle className="h-4 w-4 text-green-500" />
                         <span className="text-gray-700">{benefit}</span>
                       </div>
-                    ))}
+                  )}
                   </div>
                 </CardContent>
               </Card>
-            ))}
+            )}
           </div>
         </div>
       </section>
@@ -197,8 +197,8 @@ const HomePage: React.FC = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            {benefits.map((benefit, index) => (
-              <div key={index} className="flex gap-6">
+            {benefits.map((benefit, index) =>
+            <div key={index} className="flex gap-6">
                 <div className="flex-shrink-0 p-3 rounded-xl bg-gray-50">
                   {benefit.icon}
                 </div>
@@ -211,7 +211,7 @@ const HomePage: React.FC = () => {
                   </p>
                 </div>
               </div>
-            ))}
+            )}
           </div>
         </div>
       </section>
@@ -231,8 +231,8 @@ const HomePage: React.FC = () => {
             <Button
               onClick={() => navigate('/smart-presentation')}
               size="lg"
-              className="bg-white text-blue-600 hover:bg-blue-50 text-lg px-8 py-4 h-auto"
-            >
+              className="bg-white text-blue-600 hover:bg-blue-50 text-lg px-8 py-4 h-auto">
+
               <Brain className="h-5 w-5 mr-2" />
               Try Smart Presentation
             </Button>
@@ -241,8 +241,8 @@ const HomePage: React.FC = () => {
               onClick={() => navigate('/dashboard')}
               variant="outline"
               size="lg"
-              className="border-white text-white hover:bg-white hover:text-blue-600 text-lg px-8 py-4 h-auto"
-            >
+              className="border-white text-white hover:bg-white hover:text-blue-600 text-lg px-8 py-4 h-auto">
+
               <BarChart3 className="h-5 w-5 mr-2" />
               View Dashboard
             </Button>
@@ -293,8 +293,8 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </footer>
-    </div>
-  );
+    </div>);
+
 };
 
 export default HomePage;
