@@ -37,40 +37,40 @@ const AIProcessor: React.FC<AIProcessorProps> = ({
   // Mock AI processing function
   const processTranscript = async (text: string): Promise<AIAnalysis> => {
     setIsProcessing(true);
-    
+
     // Simulate AI processing delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     // Extract keywords (simple keyword extraction)
     const words = text.toLowerCase().split(/\s+/);
-    const importantWords = words.filter(word => 
-      word.length > 4 && 
-      !['that', 'this', 'with', 'have', 'will', 'from', 'they', 'been', 'said', 'each', 'which', 'their', 'time', 'said'].includes(word)
+    const importantWords = words.filter((word) =>
+    word.length > 4 &&
+    !['that', 'this', 'with', 'have', 'will', 'from', 'they', 'been', 'said', 'each', 'which', 'their', 'time', 'said'].includes(word)
     );
-    
+
     const keywords = [...new Set(importantWords)].slice(0, 8);
-    
+
     // Calculate topic progress based on text length and content
-    const topicProgress = Math.min((text.length / 500) * 100, 100);
-    
+    const topicProgress = Math.min(text.length / 500 * 100, 100);
+
     // Determine if topic is complete (simple heuristic)
-    const isTopicComplete = text.includes('conclusion') || 
-                           text.includes('summary') || 
-                           text.includes('next') ||
-                           text.includes('moving on') ||
-                           topicProgress > 80;
-    
+    const isTopicComplete = text.includes('conclusion') ||
+    text.includes('summary') ||
+    text.includes('next') ||
+    text.includes('moving on') ||
+    topicProgress > 80;
+
     // Generate sentiment analysis
     const positiveWords = ['good', 'great', 'excellent', 'amazing', 'wonderful', 'fantastic'];
     const negativeWords = ['bad', 'terrible', 'awful', 'horrible', 'worst'];
-    
-    const positiveCount = positiveWords.filter(word => text.toLowerCase().includes(word)).length;
-    const negativeCount = negativeWords.filter(word => text.toLowerCase().includes(word)).length;
-    
+
+    const positiveCount = positiveWords.filter((word) => text.toLowerCase().includes(word)).length;
+    const negativeCount = negativeWords.filter((word) => text.toLowerCase().includes(word)).length;
+
     let sentiment = 'neutral';
-    if (positiveCount > negativeCount) sentiment = 'positive';
-    else if (negativeCount > positiveCount) sentiment = 'negative';
-    
+    if (positiveCount > negativeCount) sentiment = 'positive';else
+    if (negativeCount > positiveCount) sentiment = 'negative';
+
     // Determine suggested action
     let suggestedAction = 'Continue speaking';
     if (isTopicComplete) {
@@ -80,11 +80,11 @@ const AIProcessor: React.FC<AIProcessorProps> = ({
     } else if (keywords.length > 5) {
       suggestedAction = 'Rich content detected';
     }
-    
+
     const confidence = Math.min(text.length / 100, 1);
-    
+
     setIsProcessing(false);
-    
+
     return {
       keywords,
       sentiment,
@@ -96,10 +96,10 @@ const AIProcessor: React.FC<AIProcessorProps> = ({
 
   useEffect(() => {
     if (transcript.length > 50) {
-      processTranscript(transcript).then(result => {
+      processTranscript(transcript).then((result) => {
         setAnalysis(result);
         onKeywordsDetected(result.keywords);
-        
+
         // Auto-advance slide if topic is complete and confidence is high
         if (result.topicProgress > 80 && result.confidence > 0.7) {
           onTopicComplete('Current topic completed');
@@ -113,9 +113,9 @@ const AIProcessor: React.FC<AIProcessorProps> = ({
 
   const getSentimentColor = (sentiment: string) => {
     switch (sentiment) {
-      case 'positive': return 'bg-green-100 text-green-800';
-      case 'negative': return 'bg-red-100 text-red-800';
-      default: return 'bg-blue-100 text-blue-800';
+      case 'positive':return 'bg-green-100 text-green-800';
+      case 'negative':return 'bg-red-100 text-red-800';
+      default:return 'bg-blue-100 text-blue-800';
     }
   };
 
@@ -125,9 +125,9 @@ const AIProcessor: React.FC<AIProcessorProps> = ({
         <CardTitle className="flex items-center gap-2">
           <Brain className="h-5 w-5" />
           AI Analysis
-          {isProcessing && (
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-          )}
+          {isProcessing &&
+          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+          }
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -138,11 +138,11 @@ const AIProcessor: React.FC<AIProcessorProps> = ({
             Detected Keywords
           </h4>
           <div className="flex flex-wrap gap-1">
-            {analysis.keywords.map((keyword, index) => (
-              <Badge key={index} variant="secondary" className="text-xs">
+            {analysis.keywords.map((keyword, index) =>
+            <Badge key={index} variant="secondary" className="text-xs">
                 {keyword}
               </Badge>
-            ))}
+            )}
           </div>
         </div>
 
@@ -161,10 +161,10 @@ const AIProcessor: React.FC<AIProcessorProps> = ({
             Topic Progress
           </h4>
           <div className="w-full bg-gray-200 rounded-full h-2">
-            <div 
+            <div
               className="bg-blue-600 h-2 rounded-full transition-all duration-500"
-              style={{ width: `${analysis.topicProgress}%` }}
-            ></div>
+              style={{ width: `${analysis.topicProgress}%` }}>
+            </div>
           </div>
           <p className="text-xs text-gray-600 mt-1">{Math.round(analysis.topicProgress)}% complete</p>
         </div>
@@ -182,10 +182,10 @@ const AIProcessor: React.FC<AIProcessorProps> = ({
           <h4 className="text-sm font-medium mb-2">Analysis Confidence</h4>
           <div className="flex items-center gap-2">
             <div className="w-full bg-gray-200 rounded-full h-1">
-              <div 
+              <div
                 className="bg-green-600 h-1 rounded-full transition-all duration-500"
-                style={{ width: `${analysis.confidence * 100}%` }}
-              ></div>
+                style={{ width: `${analysis.confidence * 100}%` }}>
+              </div>
             </div>
             <span className="text-xs text-gray-600">
               {Math.round(analysis.confidence * 100)}%
@@ -193,8 +193,8 @@ const AIProcessor: React.FC<AIProcessorProps> = ({
           </div>
         </div>
       </CardContent>
-    </Card>
-  );
+    </Card>);
+
 };
 
 export default AIProcessor;
