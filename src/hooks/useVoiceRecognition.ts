@@ -12,22 +12,22 @@ interface VoiceRecognitionHook {
 }
 
 export const useVoiceRecognition = (
-  onCommand?: (command: string) => void,
-  continuous: boolean = true
-): VoiceRecognitionHook => {
+onCommand?: (command: string) => void,
+continuous: boolean = true)
+: VoiceRecognitionHook => {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [confidence, setConfidence] = useState(0);
   const [lastCommand, setLastCommand] = useState('');
   const recognitionRef = useRef<SpeechRecognition | null>(null);
-  
+
   const isSupported = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
 
   // Voice commands pattern matching
   const processCommand = useCallback((text: string) => {
     const lowerText = text.toLowerCase().trim();
     console.log('Processing voice command:', lowerText);
-    
+
     // Define command patterns
     const commands = {
       'next slide': ['next slide', 'next page', 'go next', 'slide next', 'move forward'],
@@ -47,7 +47,7 @@ export const useVoiceRecognition = (
 
     // Find matching command
     for (const [command, patterns] of Object.entries(commands)) {
-      if (patterns.some(pattern => lowerText.includes(pattern))) {
+      if (patterns.some((pattern) => lowerText.includes(pattern))) {
         console.log('Command matched:', command);
         setLastCommand(command);
         onCommand?.(command);
@@ -95,7 +95,7 @@ export const useVoiceRecognition = (
           finalTranscript += transcript;
           setConfidence(confidence);
           console.log('Final transcript:', transcript, 'Confidence:', confidence);
-          
+
           // Process command immediately when final
           processCommand(transcript);
         } else {
@@ -109,7 +109,7 @@ export const useVoiceRecognition = (
     recognition.onerror = (event) => {
       console.error('Speech recognition error:', event.error);
       setIsListening(false);
-      
+
       // Auto-restart on certain errors
       if (event.error === 'no-speech' || event.error === 'audio-capture') {
         setTimeout(() => {
@@ -123,7 +123,7 @@ export const useVoiceRecognition = (
     recognition.onend = () => {
       console.log('Voice recognition ended');
       setIsListening(false);
-      
+
       // Auto-restart if continuous mode is enabled
       if (continuous && isListening) {
         setTimeout(() => {
@@ -141,7 +141,7 @@ export const useVoiceRecognition = (
 
   const startListening = useCallback(() => {
     if (!isSupported || !recognitionRef.current) return;
-    
+
     try {
       recognitionRef.current.start();
       console.log('Starting voice recognition');
@@ -152,7 +152,7 @@ export const useVoiceRecognition = (
 
   const stopListening = useCallback(() => {
     if (!recognitionRef.current) return;
-    
+
     recognitionRef.current.stop();
     setIsListening(false);
     console.log('Stopping voice recognition');

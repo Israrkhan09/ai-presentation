@@ -38,10 +38,10 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadComplete, userId })
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragOver(false);
-    
+
     const files = Array.from(e.dataTransfer.files);
-    const pdfFile = files.find(file => file.type === 'application/pdf');
-    
+    const pdfFile = files.find((file) => file.type === 'application/pdf');
+
     if (pdfFile) {
       setSelectedFile(pdfFile);
       if (!title) {
@@ -88,7 +88,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadComplete, userId })
     try {
       // Simulate upload progress
       const progressInterval = setInterval(() => {
-        setUploadProgress(prev => {
+        setUploadProgress((prev) => {
           if (prev >= 90) {
             clearInterval(progressInterval);
             return prev;
@@ -133,9 +133,9 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadComplete, userId })
         OrderByField: "ID",
         IsAsc: false,
         Filters: [
-          { name: "user_id", op: "Equal", value: userId },
-          { name: "file_id", op: "Equal", value: fileId }
-        ]
+        { name: "user_id", op: "Equal", value: userId },
+        { name: "file_id", op: "Equal", value: fileId }]
+
       });
 
       if (fetchError) throw fetchError;
@@ -145,11 +145,11 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadComplete, userId })
 
       toast({
         title: "Upload Successful",
-        description: `Presentation "${title}" uploaded successfully!`,
+        description: `Presentation "${title}" uploaded successfully!`
       });
 
       onUploadComplete(newPresentation);
-      
+
       // Reset form
       setSelectedFile(null);
       setTitle('');
@@ -187,51 +187,51 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadComplete, userId })
           {/* Upload Area */}
           <div
             className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-              isDragOver
-                ? 'border-blue-500 bg-blue-50'
-                : selectedFile
-                ? 'border-green-500 bg-green-50'
-                : 'border-gray-300 hover:border-gray-400'
-            }`}
+            isDragOver ?
+            'border-blue-500 bg-blue-50' :
+            selectedFile ?
+            'border-green-500 bg-green-50' :
+            'border-gray-300 hover:border-gray-400'}`
+            }
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-          >
-            {selectedFile ? (
-              <div className="space-y-4">
+            onDrop={handleDrop}>
+
+            {selectedFile ?
+            <div className="space-y-4">
                 <CheckCircle className="w-12 h-12 text-green-500 mx-auto" />
                 <div className="flex items-center justify-center space-x-2">
                   <File className="w-5 h-5 text-gray-500" />
                   <span className="text-sm font-medium">{selectedFile.name}</span>
                   <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={removeFile}
-                    className="h-6 w-6 p-0"
-                  >
+                  size="sm"
+                  variant="ghost"
+                  onClick={removeFile}
+                  className="h-6 w-6 p-0">
+
                     <X className="w-4 h-4" />
                   </Button>
                 </div>
                 <Badge variant="secondary">
                   {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB
                 </Badge>
-              </div>
-            ) : (
-              <div className="space-y-4">
+              </div> :
+
+            <div className="space-y-4">
                 <Upload className="w-12 h-12 text-gray-400 mx-auto" />
                 <div>
                   <p className="text-lg font-medium text-gray-900">Drop your PDF here</p>
                   <p className="text-sm text-gray-500">or click to browse files</p>
                 </div>
                 <Button
-                  variant="outline"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={isUploading}
-                >
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploading}>
+
                   Browse Files
                 </Button>
               </div>
-            )}
+            }
           </div>
 
           <input
@@ -239,8 +239,8 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadComplete, userId })
             type="file"
             accept=".pdf"
             onChange={handleFileSelect}
-            className="hidden"
-          />
+            className="hidden" />
+
 
           {/* Form Fields */}
           <div className="space-y-4">
@@ -251,8 +251,8 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadComplete, userId })
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Enter presentation title"
-                disabled={isUploading}
-              />
+                disabled={isUploading} />
+
             </div>
 
             <div>
@@ -263,8 +263,8 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadComplete, userId })
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Enter presentation description"
                 rows={3}
-                disabled={isUploading}
-              />
+                disabled={isUploading} />
+
             </div>
 
             <div>
@@ -274,35 +274,35 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadComplete, userId })
                 value={tags}
                 onChange={(e) => setTags(e.target.value)}
                 placeholder="Enter tags separated by commas"
-                disabled={isUploading}
-              />
+                disabled={isUploading} />
+
             </div>
           </div>
 
           {/* Upload Progress */}
-          {isUploading && (
-            <div className="space-y-2">
+          {isUploading &&
+          <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span>Uploading...</span>
                 <span>{uploadProgress}%</span>
               </div>
               <Progress value={uploadProgress} className="h-2" />
             </div>
-          )}
+          }
 
           {/* Upload Button */}
           <Button
             onClick={handleUpload}
             disabled={!selectedFile || !title.trim() || isUploading}
             className="w-full"
-            size="lg"
-          >
+            size="lg">
+
             {isUploading ? 'Uploading...' : 'Upload Presentation'}
           </Button>
         </div>
       </CardContent>
-    </Card>
-  );
+    </Card>);
+
 };
 
 export default FileUploader;
