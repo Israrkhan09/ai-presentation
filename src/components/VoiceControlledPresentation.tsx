@@ -4,18 +4,18 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
-import { 
-  Play, 
-  Pause, 
-  SkipForward, 
-  SkipBack, 
+import {
+  Play,
+  Pause,
+  SkipForward,
+  SkipBack,
   Square,
   Mic,
   Volume2,
   FileText,
   Users,
-  Timer
-} from 'lucide-react';
+  Timer } from
+'lucide-react';
 import SessionManager from './SessionManager';
 import AIContentProcessor from './AIContentProcessor';
 import DownloadManager from './DownloadManager';
@@ -80,13 +80,13 @@ const VoiceControlledPresentation: React.FC<VoiceControlledPresentationProps> = 
   // Navigation functions
   const nextSlide = () => {
     if (currentSlide < presentation.total_pages) {
-      setCurrentSlide(prev => prev + 1);
+      setCurrentSlide((prev) => prev + 1);
     }
   };
 
   const previousSlide = () => {
     if (currentSlide > 1) {
-      setCurrentSlide(prev => prev - 1);
+      setCurrentSlide((prev) => prev - 1);
     }
   };
 
@@ -145,7 +145,7 @@ const VoiceControlledPresentation: React.FC<VoiceControlledPresentationProps> = 
   };
 
   // Calculate progress
-  const slideProgress = (currentSlide / presentation.total_pages) * 100;
+  const slideProgress = currentSlide / presentation.total_pages * 100;
 
   return (
     <div className="min-h-screen bg-background p-4 space-y-6">
@@ -214,46 +214,46 @@ const VoiceControlledPresentation: React.FC<VoiceControlledPresentationProps> = 
                   onClick={previousSlide}
                   disabled={currentSlide === 1}
                   size="lg"
-                  variant="outline"
-                >
+                  variant="outline">
+
                   <SkipBack className="h-4 w-4" />
                 </Button>
 
-                {!sessionActive ? (
-                  <Button onClick={startPresentation} size="lg" className="px-8">
+                {!sessionActive ?
+                <Button onClick={startPresentation} size="lg" className="px-8">
                     <Play className="h-4 w-4 mr-2" />
                     Start Session
-                  </Button>
-                ) : !isPlaying ? (
-                  <Button onClick={resumePresentation} size="lg" className="px-8">
+                  </Button> :
+                !isPlaying ?
+                <Button onClick={resumePresentation} size="lg" className="px-8">
                     <Play className="h-4 w-4 mr-2" />
                     Resume
-                  </Button>
-                ) : (
-                  <Button onClick={pausePresentation} size="lg" variant="secondary" className="px-8">
+                  </Button> :
+
+                <Button onClick={pausePresentation} size="lg" variant="secondary" className="px-8">
                     <Pause className="h-4 w-4 mr-2" />
                     Pause
                   </Button>
-                )}
+                }
 
                 <Button
                   onClick={nextSlide}
                   disabled={currentSlide === presentation.total_pages}
                   size="lg"
-                  variant="outline"
-                >
+                  variant="outline">
+
                   <SkipForward className="h-4 w-4" />
                 </Button>
               </div>
 
-              {sessionActive && (
-                <div className="text-center">
+              {sessionActive &&
+              <div className="text-center">
                   <Button onClick={endPresentation} variant="destructive">
                     <Square className="h-4 w-4 mr-2" />
                     End Session
                   </Button>
                 </div>
-              )}
+              }
 
               <Separator className="my-4" />
 
@@ -275,31 +275,31 @@ const VoiceControlledPresentation: React.FC<VoiceControlledPresentationProps> = 
         {/* Side Panel */}
         <div className="space-y-4">
           {/* Session Manager */}
-          {presentationMode === 'setup' || presentationMode === 'presenting' ? (
-            <SessionManager
-              presentationId={presentation.id}
-              presentationTitle={presentation.title}
-              onSessionEnd={handleSessionEnd}
-              onVoiceCommand={handleVoiceCommand}
-            />
-          ) : null}
+          {presentationMode === 'setup' || presentationMode === 'presenting' ?
+          <SessionManager
+            presentationId={presentation.id}
+            presentationTitle={presentation.title}
+            onSessionEnd={handleSessionEnd}
+            onVoiceCommand={handleVoiceCommand} /> :
+
+          null}
 
           {/* AI Content Processor */}
-          {presentationMode === 'processing' && sessionData && (
-            <AIContentProcessor
-              sessionData={sessionData}
-              onProcessingComplete={handleProcessingComplete}
-              onDownload={handleDownload}
-            />
-          )}
+          {presentationMode === 'processing' && sessionData &&
+          <AIContentProcessor
+            sessionData={sessionData}
+            onProcessingComplete={handleProcessingComplete}
+            onDownload={handleDownload} />
+
+          }
 
           {/* Download Manager */}
-          {presentationMode === 'complete' && showDownloads && sessionData && processedContent && (
-            <DownloadManager
-              sessionData={sessionData}
-              processedContent={processedContent}
-            />
-          )}
+          {presentationMode === 'complete' && showDownloads && sessionData && processedContent &&
+          <DownloadManager
+            sessionData={sessionData}
+            processedContent={processedContent} />
+
+          }
 
           {/* Presentation Info */}
           <Card>
@@ -345,8 +345,8 @@ const VoiceControlledPresentation: React.FC<VoiceControlledPresentationProps> = 
           </Card>
         </div>
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default VoiceControlledPresentation;

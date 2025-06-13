@@ -4,15 +4,15 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  Download, 
-  FileText, 
-  HelpCircle, 
-  CheckCircle, 
+import {
+  Download,
+  FileText,
+  HelpCircle,
+  CheckCircle,
   Loader2,
   Calendar,
-  Clock
-} from 'lucide-react';
+  Clock } from
+'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface ProcessedContent {
@@ -61,12 +61,12 @@ const DownloadManager: React.FC<DownloadManagerProps> = ({
       // Simulate PDF generation progress
       for (let i = 0; i <= 100; i += 10) {
         setDownloadProgress(i);
-        await new Promise(resolve => setTimeout(resolve, 150));
+        await new Promise((resolve) => setTimeout(resolve, 150));
       }
 
       // Create PDF content
       const pdfContent = createPDFSummaryContent();
-      
+
       // Create and download blob
       const blob = new Blob([pdfContent], { type: 'text/plain' });
       const url = URL.createObjectURL(blob);
@@ -107,12 +107,12 @@ const DownloadManager: React.FC<DownloadManagerProps> = ({
       // Simulate quiz generation progress
       for (let i = 0; i <= 100; i += 10) {
         setDownloadProgress(i);
-        await new Promise(resolve => setTimeout(resolve, 120));
+        await new Promise((resolve) => setTimeout(resolve, 120));
       }
 
       // Create quiz content
       const quizContent = createQuizContent();
-      
+
       // Create and download blob
       const blob = new Blob([quizContent], { type: 'text/plain' });
       const url = URL.createObjectURL(blob);
@@ -147,7 +147,7 @@ const DownloadManager: React.FC<DownloadManagerProps> = ({
   const createPDFSummaryContent = (): string => {
     const date = formatDate(sessionData.startTime);
     const duration = formatDuration(sessionData.duration);
-    
+
     return `
 AI-GENERATED PRESENTATION SUMMARY
 =================================
@@ -197,7 +197,7 @@ ${new Date().toISOString()}
   // Create quiz content
   const createQuizContent = (): string => {
     const date = formatDate(sessionData.startTime);
-    
+
     let content = `
 AI-GENERATED QUIZ
 =================
@@ -263,9 +263,9 @@ ${new Date().toISOString()}
 
   const formatDuration = (seconds: number): string => {
     const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
+    const minutes = Math.floor(seconds % 3600 / 60);
     const secs = seconds % 60;
-    
+
     if (hours > 0) {
       return `${hours}h ${minutes}m ${secs}s`;
     }
@@ -298,8 +298,8 @@ ${new Date().toISOString()}
           </div>
 
           {/* Download Progress */}
-          {isGenerating && (
-            <div className="space-y-3">
+          {isGenerating &&
+          <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin" />
                 <span className="text-sm font-medium">
@@ -308,7 +308,7 @@ ${new Date().toISOString()}
               </div>
               <Progress value={downloadProgress} className="w-full" />
             </div>
-          )}
+          }
 
           {/* Download Options */}
           <div className="grid gap-4 md:grid-cols-2">
@@ -338,16 +338,16 @@ ${new Date().toISOString()}
                   </div>
                 </div>
                 
-                <Button 
+                <Button
                   onClick={generatePDFSummary}
                   disabled={isGenerating}
-                  className="w-full"
-                >
-                  {isGenerating && currentDownload === 'summary' ? (
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  ) : (
-                    <Download className="h-4 w-4 mr-2" />
-                  )}
+                  className="w-full">
+
+                  {isGenerating && currentDownload === 'summary' ?
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" /> :
+
+                  <Download className="h-4 w-4 mr-2" />
+                  }
                   Download Summary
                 </Button>
               </CardContent>
@@ -381,16 +381,16 @@ ${new Date().toISOString()}
                   </div>
                 </div>
                 
-                <Button 
+                <Button
                   onClick={generateQuizFiles}
                   disabled={isGenerating}
-                  className="w-full"
-                >
-                  {isGenerating && currentDownload === 'quiz' ? (
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  ) : (
-                    <Download className="h-4 w-4 mr-2" />
-                  )}
+                  className="w-full">
+
+                  {isGenerating && currentDownload === 'quiz' ?
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" /> :
+
+                  <Download className="h-4 w-4 mr-2" />
+                  }
                   Download Quiz
                 </Button>
               </CardContent>
@@ -398,19 +398,19 @@ ${new Date().toISOString()}
           </div>
 
           {/* Success Alert */}
-          {!isGenerating && (
-            <Alert>
+          {!isGenerating &&
+          <Alert>
               <CheckCircle className="h-4 w-4" />
               <AlertDescription>
                 Files will be downloaded in text format. For PDF generation, consider using 
                 your preferred document editor to format the content.
               </AlertDescription>
             </Alert>
-          )}
+          }
         </CardContent>
       </Card>
-    </div>
-  );
+    </div>);
+
 };
 
 export default DownloadManager;

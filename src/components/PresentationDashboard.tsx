@@ -4,18 +4,18 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Upload, 
-  FileText, 
-  Mic, 
-  Brain, 
-  TrendingUp, 
+import {
+  Upload,
+  FileText,
+  Mic,
+  Brain,
+  TrendingUp,
   Settings,
   Play,
   Users,
   Clock,
-  Star
-} from 'lucide-react';
+  Star } from
+'lucide-react';
 import { useUser } from '@/contexts/UserContext';
 import { useToast } from '@/hooks/use-toast';
 import FileUploader from '@/components/FileUploader';
@@ -46,7 +46,7 @@ const PresentationDashboard: React.FC = () => {
 
   const loadPresentations = async () => {
     if (!user) return;
-    
+
     setIsLoading(true);
     try {
       const { data, error } = await window.ezsite.apis.tablePage('presentations', {
@@ -55,17 +55,17 @@ const PresentationDashboard: React.FC = () => {
         OrderByField: 'id',
         IsAsc: false,
         Filters: [
-          {
-            name: 'user_id',
-            op: 'Equal',
-            value: user.ID
-          },
-          {
-            name: 'is_active',
-            op: 'Equal',
-            value: true
-          }
-        ]
+        {
+          name: 'user_id',
+          op: 'Equal',
+          value: user.ID
+        },
+        {
+          name: 'is_active',
+          op: 'Equal',
+          value: true
+        }]
+
       });
 
       if (error) {
@@ -79,7 +79,7 @@ const PresentationDashboard: React.FC = () => {
       }
 
       setPresentations(data?.List || []);
-      setStats(prevStats => ({
+      setStats((prevStats) => ({
         ...prevStats,
         totalPresentations: data?.VirtualCount || 0
       }));
@@ -189,17 +189,17 @@ const PresentationDashboard: React.FC = () => {
             Please log in to access the presentation dashboard.
           </AlertDescription>
         </Alert>
-      </div>
-    );
+      </div>);
+
   }
 
   if (showPresenter && selectedPresentation) {
     return (
       <VoiceControlledPresentation
         presentation={selectedPresentation}
-        onClose={closePresenter}
-      />
-    );
+        onClose={closePresenter} />);
+
+
   }
 
   return (
@@ -294,11 +294,11 @@ const PresentationDashboard: React.FC = () => {
           </TabsList>
 
           <TabsContent value="dashboard" className="space-y-4">
-            <PersonalizedDashboard 
+            <PersonalizedDashboard
               user={user}
               presentations={presentations}
-              onPresentationSelect={handlePresentationSelect}
-            />
+              onPresentationSelect={handlePresentationSelect} />
+
           </TabsContent>
 
           <TabsContent value="upload" className="space-y-4">
@@ -363,8 +363,8 @@ const PresentationDashboard: React.FC = () => {
               isLoading={isLoading}
               onPresentationSelect={handlePresentationSelect}
               onPresentationDelete={handlePresentationDelete}
-              onRefresh={loadPresentations}
-            />
+              onRefresh={loadPresentations} />
+
           </TabsContent>
 
           <TabsContent value="settings" className="space-y-4">
@@ -413,8 +413,8 @@ const PresentationDashboard: React.FC = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default PresentationDashboard;

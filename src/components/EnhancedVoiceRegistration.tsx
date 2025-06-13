@@ -50,34 +50,34 @@ const EnhancedVoiceRegistration: React.FC<EnhancedVoiceRegistrationProps> = ({
   const { toast } = useToast();
 
   const enrollmentPhases = [
-    {
-      title: "Basic Voice Sample",
-      text: "Hello, my name is [Your Name]. I am enrolling my voice for the AI presentation system.",
-      description: "Speak clearly and naturally"
-    },
-    {
-      title: "Command Recognition",
-      text: "Next slide. Previous slide. Go to first slide. End presentation.",
-      description: "Practice common presentation commands"
-    },
-    {
-      title: "Natural Speech",
-      text: "I am excited to use this AI-powered presentation system to enhance my presentations with voice control.",
-      description: "Speak conversationally"
-    },
-    {
-      title: "Technical Terms",
-      text: "Machine learning, artificial intelligence, data analysis, user interface, presentation software.",
-      description: "Practice pronunciation of technical terms"
-    }
-  ];
+  {
+    title: "Basic Voice Sample",
+    text: "Hello, my name is [Your Name]. I am enrolling my voice for the AI presentation system.",
+    description: "Speak clearly and naturally"
+  },
+  {
+    title: "Command Recognition",
+    text: "Next slide. Previous slide. Go to first slide. End presentation.",
+    description: "Practice common presentation commands"
+  },
+  {
+    title: "Natural Speech",
+    text: "I am excited to use this AI-powered presentation system to enhance my presentations with voice control.",
+    description: "Speak conversationally"
+  },
+  {
+    title: "Technical Terms",
+    text: "Machine learning, artificial intelligence, data analysis, user interface, presentation software.",
+    description: "Practice pronunciation of technical terms"
+  }];
+
 
   // Initialize speech recognition
   useEffect(() => {
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       recognitionRef.current = new SpeechRecognition();
-      
+
       if (recognitionRef.current) {
         recognitionRef.current.continuous = false;
         recognitionRef.current.interimResults = false;
@@ -114,7 +114,7 @@ const EnhancedVoiceRegistration: React.FC<EnhancedVoiceRegistrationProps> = ({
       mediaRecorder.onstop = async () => {
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
         await processAudioSample(audioBlob);
-        stream.getTracks().forEach(track => track.stop());
+        stream.getTracks().forEach((track) => track.stop());
       };
 
       mediaRecorder.start();
@@ -160,11 +160,11 @@ const EnhancedVoiceRegistration: React.FC<EnhancedVoiceRegistrationProps> = ({
 
   const processAudioSample = async (audioBlob: Blob) => {
     setIsAnalyzing(true);
-    
+
     // Simulate voice analysis
     for (let i = 0; i <= 100; i += 10) {
       setAnalysisProgress(i);
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
     }
 
     // Mock voice characteristics analysis
@@ -179,8 +179,8 @@ const EnhancedVoiceRegistration: React.FC<EnhancedVoiceRegistrationProps> = ({
     const reader = new FileReader();
     reader.onloadend = () => {
       const base64Audio = reader.result as string;
-      
-      setVoiceProfile(prev => ({
+
+      setVoiceProfile((prev) => ({
         ...prev,
         samples: [...prev.samples, base64Audio],
         characteristics: {
@@ -191,18 +191,18 @@ const EnhancedVoiceRegistration: React.FC<EnhancedVoiceRegistrationProps> = ({
 
       setIsAnalyzing(false);
       setAnalysisProgress(0);
-      
+
       if (currentPhase < enrollmentPhases.length - 1) {
         toast({
           title: "Sample Recorded",
           description: `Phase ${currentPhase + 1} completed successfully!`
         });
-        setCurrentPhase(prev => prev + 1);
+        setCurrentPhase((prev) => prev + 1);
       } else {
         completeEnrollment();
       }
     };
-    
+
     reader.readAsDataURL(audioBlob);
   };
 
@@ -211,9 +211,9 @@ const EnhancedVoiceRegistration: React.FC<EnhancedVoiceRegistrationProps> = ({
       ...voiceProfile,
       enrollmentComplete: true
     };
-    
+
     setVoiceProfile(completedProfile);
-    
+
     toast({
       title: "Voice Enrollment Complete!",
       description: "Your voice profile has been successfully created."
@@ -237,7 +237,7 @@ const EnhancedVoiceRegistration: React.FC<EnhancedVoiceRegistrationProps> = ({
   };
 
   const currentPhaseData = enrollmentPhases[currentPhase];
-  const progressPercentage = ((currentPhase + 1) / enrollmentPhases.length) * 100;
+  const progressPercentage = (currentPhase + 1) / enrollmentPhases.length * 100;
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
@@ -287,25 +287,25 @@ const EnhancedVoiceRegistration: React.FC<EnhancedVoiceRegistrationProps> = ({
 
             {/* Recording Controls */}
             <div className="flex flex-col gap-4">
-              {!isRecording && !isAnalyzing && (
-                <Button 
-                  onClick={startRecording}
-                  size="lg"
-                  className="w-full"
-                >
+              {!isRecording && !isAnalyzing &&
+              <Button
+                onClick={startRecording}
+                size="lg"
+                className="w-full">
+
                   <Mic className="h-5 w-5 mr-2" />
                   Start Recording
                 </Button>
-              )}
+              }
 
-              {isRecording && (
-                <div className="space-y-3">
-                  <Button 
-                    onClick={stopRecording}
-                    variant="destructive"
-                    size="lg"
-                    className="w-full"
-                  >
+              {isRecording &&
+              <div className="space-y-3">
+                  <Button
+                  onClick={stopRecording}
+                  variant="destructive"
+                  size="lg"
+                  className="w-full">
+
                     <MicOff className="h-5 w-5 mr-2" />
                     Stop Recording
                   </Button>
@@ -318,10 +318,10 @@ const EnhancedVoiceRegistration: React.FC<EnhancedVoiceRegistrationProps> = ({
                     <Progress value={recordingProgress} className="w-full" />
                   </div>
                 </div>
-              )}
+              }
 
-              {isAnalyzing && (
-                <div className="space-y-3">
+              {isAnalyzing &&
+              <div className="space-y-3">
                   <div className="flex items-center justify-center gap-2">
                     <RefreshCw className="h-5 w-5 animate-spin" />
                     <span>Analyzing voice sample...</span>
@@ -335,35 +335,35 @@ const EnhancedVoiceRegistration: React.FC<EnhancedVoiceRegistrationProps> = ({
                     <Progress value={analysisProgress} className="w-full" />
                   </div>
                 </div>
-              )}
+              }
 
-              {currentText && (
-                <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+              {currentText &&
+              <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
                   <div className="flex items-center gap-2 mb-2">
                     <CheckCircle className="h-4 w-4 text-green-600" />
                     <span className="text-sm font-medium text-green-800">Recognized:</span>
                   </div>
                   <p className="text-sm text-green-700">{currentText}</p>
                 </div>
-              )}
+              }
             </div>
 
             {/* Retry Button */}
-            {!isRecording && !isAnalyzing && currentText && (
-              <Button 
-                onClick={retryCurrentPhase}
-                variant="outline"
-                className="w-full"
-              >
+            {!isRecording && !isAnalyzing && currentText &&
+            <Button
+              onClick={retryCurrentPhase}
+              variant="outline"
+              className="w-full">
+
                 <RefreshCw className="h-4 w-4 mr-2" />
                 Retry This Phase
               </Button>
-            )}
+            }
           </div>
 
           {/* Voice Profile Preview */}
-          {voiceProfile.samples.length > 0 && (
-            <Card>
+          {voiceProfile.samples.length > 0 &&
+          <Card>
               <CardHeader>
                 <CardTitle className="text-base">Voice Profile Analysis</CardTitle>
               </CardHeader>
@@ -380,24 +380,24 @@ const EnhancedVoiceRegistration: React.FC<EnhancedVoiceRegistrationProps> = ({
                 </div>
               </CardContent>
             </Card>
-          )}
+          }
 
           {/* Action Buttons */}
           <div className="flex gap-3">
             <Button onClick={skipEnrollment} variant="outline" className="flex-1">
               Skip for Now
             </Button>
-            {voiceProfile.enrollmentComplete && (
-              <Button onClick={() => onEnrollmentComplete(voiceProfile)} className="flex-1">
+            {voiceProfile.enrollmentComplete &&
+            <Button onClick={() => onEnrollmentComplete(voiceProfile)} className="flex-1">
                 <CheckCircle className="h-4 w-4 mr-2" />
                 Complete Enrollment
               </Button>
-            )}
+            }
           </div>
         </CardContent>
       </Card>
-    </div>
-  );
+    </div>);
+
 };
 
 export default EnhancedVoiceRegistration;

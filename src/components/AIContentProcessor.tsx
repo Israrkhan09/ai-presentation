@@ -44,32 +44,32 @@ const AIContentProcessor: React.FC<AIContentProcessorProps> = ({
   const processContent = async () => {
     setIsProcessing(true);
     setProgress(0);
-    
+
     try {
       // Step 1: Analyze spoken content
       setCurrentStep('Analyzing spoken content...');
       setProgress(20);
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await new Promise((resolve) => setTimeout(resolve, 1500));
 
       // Step 2: Extract key concepts
       setCurrentStep('Extracting key concepts...');
       setProgress(40);
-      await new Promise(resolve => setTimeout(resolve, 1200));
+      await new Promise((resolve) => setTimeout(resolve, 1200));
 
       // Step 3: Generate summary
       setCurrentStep('Generating summary...');
       setProgress(60);
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // Step 4: Create quiz questions
       setCurrentStep('Creating quiz questions...');
       setProgress(80);
-      await new Promise(resolve => setTimeout(resolve, 1300));
+      await new Promise((resolve) => setTimeout(resolve, 1300));
 
       // Step 5: Finalizing content
       setCurrentStep('Finalizing content...');
       setProgress(100);
-      await new Promise(resolve => setTimeout(resolve, 800));
+      await new Promise((resolve) => setTimeout(resolve, 800));
 
       // Mock processed content based on session data
       const processed: ProcessedContent = {
@@ -98,13 +98,13 @@ const AIContentProcessor: React.FC<AIContentProcessorProps> = ({
   const extractKeyPoints = (data: SessionData): string[] => {
     const topics = extractTopicsFromSpokenContent(data.spokenContent);
     return [
-      `Presentation Duration: ${Math.round(data.sessionDuration / 60)} minutes`,
-      `Total Slides Covered: ${data.slideTransitions.length}`,
-      `Main Topics Discussed: ${topics.join(', ')}`,
-      `Average Time per Slide: ${Math.round(data.sessionDuration / data.slideTransitions.length)} seconds`,
-      'Interactive voice-controlled navigation used throughout',
-      'Comprehensive coverage of all presentation materials'
-    ];
+    `Presentation Duration: ${Math.round(data.sessionDuration / 60)} minutes`,
+    `Total Slides Covered: ${data.slideTransitions.length}`,
+    `Main Topics Discussed: ${topics.join(', ')}`,
+    `Average Time per Slide: ${Math.round(data.sessionDuration / data.slideTransitions.length)} seconds`,
+    'Interactive voice-controlled navigation used throughout',
+    'Comprehensive coverage of all presentation materials'];
+
   };
 
   const generateMCQs = (data: SessionData): Array<{
@@ -114,58 +114,58 @@ const AIContentProcessor: React.FC<AIContentProcessorProps> = ({
   }> => {
     const topics = extractTopicsFromSpokenContent(data.spokenContent);
     return [
-      {
-        question: `What was the main focus of the "${data.presentationTitle}" presentation?`,
-        options: [
-          topics[0] || 'Primary concept discussion',
-          'Secondary topic analysis',
-          'Background information only',
-          'General overview'
-        ],
-        correctAnswer: 0
-      },
-      {
-        question: `How long was the presentation session?`,
-        options: [
-          `${Math.round(data.sessionDuration / 60)} minutes`,
-          `${Math.round(data.sessionDuration / 60) + 5} minutes`,
-          `${Math.round(data.sessionDuration / 60) - 3} minutes`,
-          `${Math.round(data.sessionDuration / 60) + 10} minutes`
-        ],
-        correctAnswer: 0
-      },
-      {
-        question: `How many slides were covered in the presentation?`,
-        options: [
-          `${data.slideTransitions.length} slides`,
-          `${data.slideTransitions.length + 2} slides`,
-          `${data.slideTransitions.length - 1} slides`,
-          `${data.slideTransitions.length + 5} slides`
-        ],
-        correctAnswer: 0
-      }
-    ];
+    {
+      question: `What was the main focus of the "${data.presentationTitle}" presentation?`,
+      options: [
+      topics[0] || 'Primary concept discussion',
+      'Secondary topic analysis',
+      'Background information only',
+      'General overview'],
+
+      correctAnswer: 0
+    },
+    {
+      question: `How long was the presentation session?`,
+      options: [
+      `${Math.round(data.sessionDuration / 60)} minutes`,
+      `${Math.round(data.sessionDuration / 60) + 5} minutes`,
+      `${Math.round(data.sessionDuration / 60) - 3} minutes`,
+      `${Math.round(data.sessionDuration / 60) + 10} minutes`],
+
+      correctAnswer: 0
+    },
+    {
+      question: `How many slides were covered in the presentation?`,
+      options: [
+      `${data.slideTransitions.length} slides`,
+      `${data.slideTransitions.length + 2} slides`,
+      `${data.slideTransitions.length - 1} slides`,
+      `${data.slideTransitions.length + 5} slides`],
+
+      correctAnswer: 0
+    }];
+
   };
 
   const generateTheoryQuestions = (data: SessionData): string[] => {
     const topics = extractTopicsFromSpokenContent(data.spokenContent);
     return [
-      `Explain the key concepts presented in "${data.presentationTitle}" and their practical applications.`,
-      `Discuss the main themes covered during the ${Math.round(data.sessionDuration / 60)}-minute presentation session.`,
-      `Analyze how the voice-controlled presentation format enhanced the learning experience.`,
-      `Compare and contrast the different topics covered: ${topics.join(', ')}.`,
-      `Evaluate the effectiveness of the presentation structure and content delivery.`
-    ];
+    `Explain the key concepts presented in "${data.presentationTitle}" and their practical applications.`,
+    `Discuss the main themes covered during the ${Math.round(data.sessionDuration / 60)}-minute presentation session.`,
+    `Analyze how the voice-controlled presentation format enhanced the learning experience.`,
+    `Compare and contrast the different topics covered: ${topics.join(', ')}.`,
+    `Evaluate the effectiveness of the presentation structure and content delivery.`];
+
   };
 
   const extractTopicsFromSpokenContent = (spokenContent: string[]): string[] => {
     // Mock topic extraction from spoken content
     const commonTopics = [
-      'Data Analysis', 'Machine Learning', 'Business Strategy', 'Technology Innovation',
-      'Market Research', 'User Experience', 'Project Management', 'Digital Transformation',
-      'Artificial Intelligence', 'Software Development', 'Cloud Computing', 'Cybersecurity'
-    ];
-    
+    'Data Analysis', 'Machine Learning', 'Business Strategy', 'Technology Innovation',
+    'Market Research', 'User Experience', 'Project Management', 'Digital Transformation',
+    'Artificial Intelligence', 'Software Development', 'Cloud Computing', 'Cybersecurity'];
+
+
     // Simulate topic extraction based on content length
     const numTopics = Math.min(3 + Math.floor(spokenContent.length / 5), 6);
     return commonTopics.slice(0, numTopics);
@@ -190,18 +190,18 @@ const AIContentProcessor: React.FC<AIContentProcessorProps> = ({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {isProcessing && (
-            <div className="space-y-3">
+          {isProcessing &&
+          <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">{currentStep}</span>
                 <span className="text-sm text-muted-foreground">{progress}%</span>
               </div>
               <Progress value={progress} className="w-full" />
             </div>
-          )}
+          }
 
-          {processedContent && (
-            <div className="space-y-4">
+          {processedContent &&
+          <div className="space-y-4">
               <Badge variant="outline" className="bg-green-50 text-green-700">
                 Processing Complete
               </Badge>
@@ -218,11 +218,11 @@ const AIContentProcessor: React.FC<AIContentProcessorProps> = ({
                     <p className="text-sm text-muted-foreground mb-3">
                       {processedContent.summary.substring(0, 100)}...
                     </p>
-                    <Button 
-                      onClick={() => onDownload('summary')}
-                      size="sm"
-                      className="w-full"
-                    >
+                    <Button
+                    onClick={() => onDownload('summary')}
+                    size="sm"
+                    className="w-full">
+
                       <Download className="h-4 w-4 mr-2" />
                       Download Summary
                     </Button>
@@ -240,11 +240,11 @@ const AIContentProcessor: React.FC<AIContentProcessorProps> = ({
                     <p className="text-sm text-muted-foreground mb-3">
                       {processedContent.mcqs.length} MCQs and {processedContent.theoryQuestions.length} theory questions
                     </p>
-                    <Button 
-                      onClick={() => onDownload('quiz')}
-                      size="sm"
-                      className="w-full"
-                    >
+                    <Button
+                    onClick={() => onDownload('quiz')}
+                    size="sm"
+                    className="w-full">
+
                       <Download className="h-4 w-4 mr-2" />
                       Download Quiz
                     </Button>
@@ -255,20 +255,20 @@ const AIContentProcessor: React.FC<AIContentProcessorProps> = ({
               <div className="space-y-3">
                 <h4 className="font-semibold">Key Points Extracted:</h4>
                 <ul className="space-y-1">
-                  {processedContent.keyPoints.map((point, index) => (
-                    <li key={index} className="text-sm flex items-start gap-2">
+                  {processedContent.keyPoints.map((point, index) =>
+                <li key={index} className="text-sm flex items-start gap-2">
                       <span className="text-primary">•</span>
                       {point}
                     </li>
-                  ))}
+                )}
                 </ul>
               </div>
             </div>
-          )}
+          }
         </CardContent>
       </Card>
-    </div>
-  );
+    </div>);
+
 };
 
 export default AIContentProcessor;

@@ -4,18 +4,18 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { 
-  Play, 
-  Pause, 
-  Square, 
-  Mic, 
-  MicOff, 
-  Clock, 
+import {
+  Play,
+  Pause,
+  Square,
+  Mic,
+  MicOff,
+  Clock,
   MessageCircle,
   FileText,
   Volume2,
-  VolumeX
-} from 'lucide-react';
+  VolumeX } from
+'lucide-react';
 
 interface SessionData {
   presentationId: number;
@@ -57,7 +57,7 @@ const SessionManager: React.FC<SessionManagerProps> = ({
   const [currentSlide, setCurrentSlide] = useState(1);
   const [lastSpokenText, setLastSpokenText] = useState('');
   const [voiceEnabled, setVoiceEnabled] = useState(true);
-  
+
   const intervalRef = useRef<NodeJS.Timeout>();
   const recognitionRef = useRef<SpeechRecognition | null>(null);
 
@@ -66,7 +66,7 @@ const SessionManager: React.FC<SessionManagerProps> = ({
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       recognitionRef.current = new SpeechRecognition();
-      
+
       if (recognitionRef.current) {
         recognitionRef.current.continuous = true;
         recognitionRef.current.interimResults = true;
@@ -87,7 +87,7 @@ const SessionManager: React.FC<SessionManagerProps> = ({
 
           if (finalTranscript) {
             setLastSpokenText(finalTranscript);
-            setSession(prev => ({
+            setSession((prev) => ({
               ...prev,
               spokenContent: [...prev.spokenContent, finalTranscript]
             }));
@@ -95,7 +95,7 @@ const SessionManager: React.FC<SessionManagerProps> = ({
             // Check for voice commands
             const command = detectVoiceCommand(finalTranscript.toLowerCase());
             if (command) {
-              setSession(prev => ({
+              setSession((prev) => ({
                 ...prev,
                 voiceCommands: [...prev.voiceCommands, command]
               }));
@@ -114,14 +114,14 @@ const SessionManager: React.FC<SessionManagerProps> = ({
   // Voice command detection
   const detectVoiceCommand = (text: string): string | null => {
     const commands = [
-      { pattern: /next slide|go forward|slide forward/, command: 'NEXT_SLIDE' },
-      { pattern: /previous slide|go back|slide back/, command: 'PREV_SLIDE' },
-      { pattern: /first slide|go to start/, command: 'FIRST_SLIDE' },
-      { pattern: /last slide|go to end/, command: 'LAST_SLIDE' },
-      { pattern: /pause presentation/, command: 'PAUSE' },
-      { pattern: /resume presentation/, command: 'RESUME' },
-      { pattern: /end session|stop presentation/, command: 'END_SESSION' }
-    ];
+    { pattern: /next slide|go forward|slide forward/, command: 'NEXT_SLIDE' },
+    { pattern: /previous slide|go back|slide back/, command: 'PREV_SLIDE' },
+    { pattern: /first slide|go to start/, command: 'FIRST_SLIDE' },
+    { pattern: /last slide|go to end/, command: 'LAST_SLIDE' },
+    { pattern: /pause presentation/, command: 'PAUSE' },
+    { pattern: /resume presentation/, command: 'RESUME' },
+    { pattern: /end session|stop presentation/, command: 'END_SESSION' }];
+
 
     for (const cmd of commands) {
       if (cmd.pattern.test(text)) {
@@ -133,7 +133,7 @@ const SessionManager: React.FC<SessionManagerProps> = ({
 
   // Start session
   const startSession = () => {
-    setSession(prev => ({
+    setSession((prev) => ({
       ...prev,
       isActive: true,
       startTime: new Date()
@@ -141,7 +141,7 @@ const SessionManager: React.FC<SessionManagerProps> = ({
 
     // Start duration timer
     intervalRef.current = setInterval(() => {
-      setSession(prev => ({
+      setSession((prev) => ({
         ...prev,
         duration: prev.duration + 1
       }));
@@ -205,7 +205,7 @@ const SessionManager: React.FC<SessionManagerProps> = ({
   // Record slide transition
   const recordSlideTransition = (slideNumber: number) => {
     setCurrentSlide(slideNumber);
-    setSession(prev => ({
+    setSession((prev) => ({
       ...prev,
       slideTransitions: [...prev.slideTransitions, slideNumber]
     }));
@@ -214,9 +214,9 @@ const SessionManager: React.FC<SessionManagerProps> = ({
   // Format duration
   const formatDuration = (seconds: number): string => {
     const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
+    const minutes = Math.floor(seconds % 3600 / 60);
     const secs = seconds % 60;
-    
+
     if (hours > 0) {
       return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
@@ -255,29 +255,29 @@ const SessionManager: React.FC<SessionManagerProps> = ({
           <Separator />
 
           <div className="flex gap-2">
-            {!session.isActive ? (
-              <Button onClick={startSession} className="flex-1">
+            {!session.isActive ?
+            <Button onClick={startSession} className="flex-1">
                 <Play className="h-4 w-4 mr-2" />
                 Start Session
-              </Button>
-            ) : (
-              <Button onClick={endSession} variant="destructive" className="flex-1">
+              </Button> :
+
+            <Button onClick={endSession} variant="destructive" className="flex-1">
                 <Square className="h-4 w-4 mr-2" />
                 End Session
               </Button>
-            )}
+            }
             
             <Button
               onClick={toggleVoice}
               variant={voiceEnabled ? "default" : "outline"}
-              size="icon"
-            >
+              size="icon">
+
               {voiceEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
             </Button>
           </div>
 
-          {session.isActive && (
-            <div className="space-y-3">
+          {session.isActive &&
+          <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">Voice Recognition</span>
                 <Badge variant={isRecording ? "default" : "secondary"}>
@@ -286,19 +286,19 @@ const SessionManager: React.FC<SessionManagerProps> = ({
                 </Badge>
               </div>
               
-              {lastSpokenText && (
-                <div className="p-3 bg-muted rounded-lg">
+              {lastSpokenText &&
+            <div className="p-3 bg-muted rounded-lg">
                   <p className="text-sm text-muted-foreground mb-1">Last Spoken:</p>
                   <p className="text-sm">{lastSpokenText}</p>
                 </div>
-              )}
+            }
             </div>
-          )}
+          }
         </CardContent>
       </Card>
 
-      {session.isActive && (
-        <Card>
+      {session.isActive &&
+      <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <MessageCircle className="h-5 w-5" />
@@ -321,25 +321,25 @@ const SessionManager: React.FC<SessionManagerProps> = ({
               </div>
             </div>
 
-            {session.voiceCommands.length > 0 && (
-              <div className="mt-4">
+            {session.voiceCommands.length > 0 &&
+          <div className="mt-4">
                 <h4 className="font-medium mb-2">Recent Commands:</h4>
                 <ScrollArea className="h-24">
                   <div className="space-y-1">
-                    {session.voiceCommands.slice(-5).map((command, index) => (
-                      <Badge key={index} variant="outline" className="mr-2">
+                    {session.voiceCommands.slice(-5).map((command, index) =>
+                <Badge key={index} variant="outline" className="mr-2">
                         {command.replace('_', ' ').toLowerCase()}
                       </Badge>
-                    ))}
+                )}
                   </div>
                 </ScrollArea>
               </div>
-            )}
+          }
           </CardContent>
         </Card>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 };
 
 export default SessionManager;

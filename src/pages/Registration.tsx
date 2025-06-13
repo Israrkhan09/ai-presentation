@@ -31,7 +31,7 @@ const Registration: React.FC = () => {
   const { toast } = useToast();
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
     if (error) setError('');
   };
 
@@ -65,7 +65,7 @@ const Registration: React.FC = () => {
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
 
     setIsLoading(true);
@@ -96,7 +96,7 @@ const Registration: React.FC = () => {
   const handleVoiceEnrollmentComplete = (profile: any) => {
     setVoiceProfile(profile);
     setStep('complete');
-    
+
     toast({
       title: "Voice Enrollment Complete!",
       description: "Your AI-powered presentation system is ready to use."
@@ -130,11 +130,11 @@ const Registration: React.FC = () => {
           
           <EnhancedVoiceRegistration
             onEnrollmentComplete={handleVoiceEnrollmentComplete}
-            onSkip={handleSkipVoice}
-          />
+            onSkip={handleSkipVoice} />
+
         </div>
-      </div>
-    );
+      </div>);
+
   }
 
   if (step === 'complete') {
@@ -155,11 +155,11 @@ const Registration: React.FC = () => {
               <Badge variant="outline" className="bg-green-50">
                 Account Created Successfully
               </Badge>
-              {voiceProfile && (
-                <Badge variant="outline" className="bg-blue-50">
+              {voiceProfile &&
+              <Badge variant="outline" className="bg-blue-50">
                   Voice Profile Enrolled
                 </Badge>
-              )}
+              }
             </div>
             
             <div className="text-sm text-muted-foreground space-y-1">
@@ -173,8 +173,8 @@ const Registration: React.FC = () => {
             </Button>
           </CardContent>
         </Card>
-      </div>
-    );
+      </div>);
+
   }
 
   return (
@@ -191,12 +191,12 @@ const Registration: React.FC = () => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleFormSubmit} className="space-y-4">
-            {error && (
-              <Alert variant="destructive">
+            {error &&
+            <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
-            )}
+            }
 
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
@@ -210,8 +210,8 @@ const Registration: React.FC = () => {
                     value={formData.name}
                     onChange={(e) => handleInputChange('name', e.target.value)}
                     className="pl-10"
-                    required
-                  />
+                    required />
+
                 </div>
               </div>
 
@@ -244,8 +244,8 @@ const Registration: React.FC = () => {
                   value={formData.email}
                   onChange={(e) => handleInputChange('email', e.target.value)}
                   className="pl-10"
-                  required
-                />
+                  required />
+
               </div>
             </div>
 
@@ -256,8 +256,8 @@ const Registration: React.FC = () => {
                 type="text"
                 placeholder="Your company or institution"
                 value={formData.organization}
-                onChange={(e) => handleInputChange('organization', e.target.value)}
-              />
+                onChange={(e) => handleInputChange('organization', e.target.value)} />
+
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
@@ -272,8 +272,8 @@ const Registration: React.FC = () => {
                     value={formData.password}
                     onChange={(e) => handleInputChange('password', e.target.value)}
                     className="pl-10"
-                    required
-                  />
+                    required />
+
                 </div>
               </div>
 
@@ -288,8 +288,8 @@ const Registration: React.FC = () => {
                     value={formData.confirmPassword}
                     onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
                     className="pl-10"
-                    required
-                  />
+                    required />
+
                 </div>
               </div>
             </div>
@@ -306,8 +306,8 @@ const Registration: React.FC = () => {
                     type="button"
                     variant="link"
                     className="p-0"
-                    onClick={() => navigate('/login')}
-                  >
+                    onClick={() => navigate('/login')}>
+
                     Sign in here
                   </Button>
                 </p>
@@ -326,8 +326,8 @@ const Registration: React.FC = () => {
           </div>
         </CardContent>
       </Card>
-    </div>
-  );
+    </div>);
+
 };
 
 export default Registration;
