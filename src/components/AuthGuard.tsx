@@ -6,12 +6,12 @@ interface AuthGuardProps {
 }
 
 const AuthGuard = ({ children }: AuthGuardProps) => {
-  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
-  
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" replace data-id="izg6tfr8e" data-path="src/components/AuthGuard.tsx" />;
   }
-  
+
   return <>{children}</>;
 };
 
