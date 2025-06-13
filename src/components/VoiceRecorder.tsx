@@ -1,224 +1,153 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Mic, MicOff, Play, Pause, RotateCcw } from 'lucide-react';
+import { Mic, MicOff, Volume2 } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 
 interface VoiceRecorderProps {
-  onRecordingComplete: (audioData: string) => void;
-  isRequired?: boolean;
+  onVoiceCommand?: (command: string) => void;
+  isActive?: boolean;
+  showCommands?: boolean;
 }
 
-const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
-  onRecordingComplete,
-  isRequired = false
-}) => {
-  const [isRecording, setIsRecording] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [recordingTime, setRecordingTime] = useState(0);
-  const [hasRecording, setHasRecording] = useState(false);
-  const [audioURL, setAudioURL] = useState<string>('');
+const VoiceRecorder = ({ onVoiceCommand, isActive = false, showCommands = true }: VoiceRecorderProps) => {
+  const [isListening, setIsListening] = useState(false);
+  const [transcript, setTranscript] = useState('');
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
 
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const chunksRef = useRef<Blob[]>([]);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const voiceCommands = [
+    'next slide', 'previous slide', 'first slide', 'last slide',
+    'start presentation', 'end presentation', 'pause', 'resume'
+  ];
 
   useEffect(() => {
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-    };
-  }, []);
+    if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognitionRef.current = new SpeechRecognition();
+      
+      recognitionRef.current.continuous = true;
+      recognitionRef.current.interimResults = true;
+      recognitionRef.current.lang = 'en-US';
 
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-      mediaRecorderRef.current = new MediaRecorder(stream);
-      chunksRef.current = [];
-
-      mediaRecorderRef.current.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          chunksRef.current.push(event.data);
+      recognitionRef.current.onresult = (event) => {
+        let currentTranscript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          currentTranscript += event.results[i][0].transcript;
+        }
+        setTranscript(currentTranscript);
+        
+        // Check for voice commands
+        const command = currentTranscript.toLowerCase().trim();
+        if (voiceCommands.some(cmd => command.includes(cmd))) {
+          onVoiceCommand?.(command);
+          toast({
+            title: "Voice Command Detected",
+            description: `Executed: ${command}`,
+          });
         }
       };
 
-      mediaRecorderRef.current.onstop = () => {
-        const audioBlob = new Blob(chunksRef.current, { type: 'audio/wav' });
-        const url = URL.createObjectURL(audioBlob);
-        setAudioURL(url);
-        setHasRecording(true);
-
-        // Convert to base64 for storage
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          const base64data = reader.result as string;
-          onRecordingComplete(base64data);
-        };
-        reader.readAsDataURL(audioBlob);
-
-        // Stop all tracks
-        stream.getTracks().forEach((track) => track.stop());
+      recognitionRef.current.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        toast({
+          title: "Voice Recognition Error",
+          description: "Please check your microphone and try again.",
+          variant: "destructive",
+        });
       };
-
-      mediaRecorderRef.current.start();
-      setIsRecording(true);
-      setRecordingTime(0);
-
-      // Start timer
-      timerRef.current = setInterval(() => {
-        setRecordingTime((prev) => prev + 1);
-      }, 1000);
-
-      console.log('Voice recording started');
-    } catch (error) {
-      console.error('Error starting recording:', error);
-      alert('Unable to access microphone. Please check your permissions.');
     }
-  };
 
-  const stopRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
-
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
       }
+    };
+  }, [onVoiceCommand]);
 
-      console.log('Voice recording stopped');
+  const startListening = () => {
+    if (recognitionRef.current && !isListening) {
+      recognitionRef.current.start();
+      setIsListening(true);
+      setTranscript('');
     }
   };
 
-  const playRecording = () => {
-    if (audioURL && !isPlaying) {
-      audioRef.current = new Audio(audioURL);
-      audioRef.current.play();
-      setIsPlaying(true);
-
-      audioRef.current.onended = () => {
-        setIsPlaying(false);
-      };
-    } else if (audioRef.current && isPlaying) {
-      audioRef.current.pause();
-      setIsPlaying(false);
+  const stopListening = () => {
+    if (recognitionRef.current && isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
     }
   };
 
-  const resetRecording = () => {
-    setHasRecording(false);
-    setAudioURL('');
-    setRecordingTime(0);
-    setIsPlaying(false);
-
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current = null;
+  const toggleListening = () => {
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
     }
-
-    onRecordingComplete('');
   };
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
+  useEffect(() => {
+    if (isActive && !isListening) {
+      startListening();
+    } else if (!isActive && isListening) {
+      stopListening();
+    }
+  }, [isActive]);
 
   return (
     <Card className="w-full">
-      <CardHeader>
+      <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2">
-          <Mic className="h-5 w-5" />
-          Voice Profile Recording
-          {isRequired && <Badge variant="destructive">Required</Badge>}
+          <Volume2 className="h-5 w-5" />
+          Voice Control
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="text-sm text-gray-600 mb-4">
-          Please record a short voice sample (10-30 seconds) by reading this text:
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={toggleListening}
+            variant={isListening ? "destructive" : "default"}
+            size="sm"
+            className="flex items-center gap-2"
+          >
+            {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+            {isListening ? 'Stop Listening' : 'Start Listening'}
+          </Button>
+          <Badge variant={isListening ? "default" : "secondary"}>
+            {isListening ? 'Active' : 'Inactive'}
+          </Badge>
         </div>
-        
-        <div className="bg-gray-50 p-4 rounded-lg italic text-center">
-          "Hello, my name is [your name] and I'm excited to use this AI-powered presentation system. 
-          This voice sample will help personalize my experience and improve speech recognition accuracy."
-        </div>
 
-        <div className="flex flex-col items-center space-y-4">
-          {/* Recording Status */}
-          <div className="flex items-center gap-4">
-            {isRecording &&
-            <Badge variant="destructive" className="animate-pulse">
-                Recording... {formatTime(recordingTime)}
-              </Badge>
-            }
-            {hasRecording && !isRecording &&
-            <Badge variant="secondary">
-                Recording saved ({formatTime(recordingTime)})
-              </Badge>
-            }
+        {transcript && (
+          <div className="p-3 bg-muted rounded-lg">
+            <p className="text-sm text-muted-foreground mb-1">Current Speech:</p>
+            <p className="text-sm">{transcript}</p>
           </div>
+        )}
 
-          {/* Controls */}
-          <div className="flex items-center gap-2">
-            {!isRecording && !hasRecording &&
-            <Button
-              onClick={startRecording}
-              className="flex items-center gap-2"
-              size="lg">
-
-                <Mic className="h-4 w-4" />
-                Start Recording
-              </Button>
-            }
-
-            {isRecording &&
-            <Button
-              onClick={stopRecording}
-              variant="destructive"
-              className="flex items-center gap-2"
-              size="lg">
-
-                <MicOff className="h-4 w-4" />
-                Stop Recording
-              </Button>
-            }
-
-            {hasRecording &&
-            <>
-                <Button
-                onClick={playRecording}
-                variant="outline"
-                className="flex items-center gap-2">
-
-                  {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-                  {isPlaying ? 'Pause' : 'Play'}
-                </Button>
-                
-                <Button
-                onClick={resetRecording}
-                variant="outline"
-                className="flex items-center gap-2">
-
-                  <RotateCcw className="h-4 w-4" />
-                  Re-record
-                </Button>
-              </>
-            }
+        {showCommands && (
+          <div>
+            <p className="text-sm font-medium mb-2">Available Commands:</p>
+            <div className="flex flex-wrap gap-1">
+              {voiceCommands.map((command, index) => (
+                <Badge key={index} variant="outline" className="text-xs">
+                  {command}
+                </Badge>
+              ))}
+            </div>
           </div>
+        )}
 
-          {/* Instructions */}
-          <div className="text-xs text-gray-500 text-center max-w-md">
-            {!hasRecording && "Click 'Start Recording' and read the text above clearly. A good voice sample helps improve recognition accuracy."}
-            {hasRecording && "Great! Your voice profile has been recorded. You can play it back or re-record if needed."}
-          </div>
-        </div>
+        {!('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) && (
+          <p className="text-sm text-muted-foreground">
+            Speech recognition is not supported in your browser.
+          </p>
+        )}
       </CardContent>
-    </Card>);
-
+    </Card>
+  );
 };
 
 export default VoiceRecorder;

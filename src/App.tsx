@@ -1,96 +1,65 @@
-import { Toaster } from "@/components/ui/toaster";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { UserProvider, useUser } from "@/contexts/UserContext";
-import HomePage from "./pages/HomePage";
-import Registration from "./pages/Registration";
-import Login from "./pages/Login";
-import NotFound from "./pages/NotFound";
-import PresentationDashboard from "./components/PresentationDashboard";
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Toaster } from '@/components/ui/toaster';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import AuthGuard from '@/components/AuthGuard';
+import LoginPage from '@/pages/LoginPage';
+import RegisterPage from '@/pages/RegisterPage';
+import VoiceSetupPage from '@/pages/VoiceSetupPage';
+import DashboardPage from '@/pages/DashboardPage';
+import PresentationPage from '@/pages/PresentationPage';
+import { useAuthStore } from '@/store/authStore';
 
 const queryClient = new QueryClient();
 
-// Protected Route Component
-const ProtectedRoute = ({ children }: {children: React.ReactNode;}) => {
-  const { isAuthenticated, isLoading } = useUser();
+function App() {
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p>Loading...</p>
-        </div>
-      </div>);
-
-  }
-
-  return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
-};
-
-// Public Route Component (redirect to dashboard if authenticated)
-const PublicRoute = ({ children }: {children: React.ReactNode;}) => {
-  const { isAuthenticated, isLoading } = useUser();
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p>Loading...</p>
-        </div>
-      </div>);
-
-  }
-
-  return isAuthenticated ? <Navigate to="/dashboard" replace /> : <>{children}</>;
-};
-
-const AppRoutes = () => {
   return (
-    <Routes>
-      <Route path="/" element={
-      <PublicRoute>
-          <HomePage />
-        </PublicRoute>
-      } />
-      
-      <Route path="/register" element={
-      <PublicRoute>
-          <Registration />
-        </PublicRoute>
-      } />
-      
-      <Route path="/login" element={
-      <PublicRoute>
-          <Login />
-        </PublicRoute>
-      } />
-      
-      <Route path="/dashboard" element={
-      <ProtectedRoute>
-          <PresentationDashboard />
-        </ProtectedRoute>
-      } />
-      
-      {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-      <Route path="*" element={<NotFound />} />
-    </Routes>);
-
-};
-
-const App = () =>
-<QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <UserProvider>
-        <Toaster />
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
-      </UserProvider>
-    </TooltipProvider>
-  </QueryClientProvider>;
-
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Router>
+          <div className="App">
+            <Routes>
+              {/* Auth Routes */}
+              <Route path="/login" element={
+                isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />
+              } />
+              <Route path="/register" element={
+                isAuthenticated ? <Navigate to="/dashboard" replace /> : <RegisterPage />
+              } />
+              
+              {/* Protected Routes */}
+              <Route path="/voice-setup" element={
+                <AuthGuard>
+                  <VoiceSetupPage />
+                </AuthGuard>
+              } />
+              <Route path="/dashboard" element={
+                <AuthGuard>
+                  <DashboardPage />
+                </AuthGuard>
+              } />
+              <Route path="/present/:id" element={
+                <AuthGuard>
+                  <PresentationPage />
+                </AuthGuard>
+              } />
+              
+              {/* Default redirect */}
+              <Route path="/" element={
+                <Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />
+              } />
+              <Route path="*" element={
+                <Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />
+              } />
+            </Routes>
+            <Toaster />
+          </div>
+        </Router>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+}
 
 export default App;
