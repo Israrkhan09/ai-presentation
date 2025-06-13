@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ChevronLeft, ChevronRight, Upload, Presentation, Eye } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { ChevronLeft, ChevronRight, Upload, Presentation, Eye, FileText, X } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface Slide {
   id: number;
@@ -23,6 +25,9 @@ const SlideViewer: React.FC<SlideViewerProps> = ({
   onSlideChange,
   autoAdvance = false
 }) => {
+  const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
   const [currentSlide, setCurrentSlide] = useState(0);
   const [slides, setSlides] = useState<Slide[]>([
     {
@@ -63,17 +68,18 @@ const SlideViewer: React.FC<SlideViewerProps> = ({
   ]);
 
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
 
   useEffect(() => {
     onSlideChange(currentSlide);
   }, [currentSlide, onSlideChange]);
 
   const nextSlide = () => {
-    setCurrentSlide(prev => (prev + 1) % slides.length);
+    setCurrentSlide((prev) => (prev + 1) % slides.length);
   };
 
   const prevSlide = () => {
-    setCurrentSlide(prev => (prev - 1 + slides.length) % slides.length);
+    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
   };
 
   const goToSlide = (index: number) => {
@@ -82,16 +88,16 @@ const SlideViewer: React.FC<SlideViewerProps> = ({
 
   const highlightText = (text: string, keywords: string[]) => {
     if (!keywords.length) return text;
-    
+
     let highlightedText = text;
-    keywords.forEach(keyword => {
+    keywords.forEach((keyword) => {
       const regex = new RegExp(`\\b${keyword}\\b`, 'gi');
       highlightedText = highlightedText.replace(
-        regex, 
+        regex,
         `<span class="bg-yellow-200 px-1 rounded font-semibold">$&</span>`
       );
     });
-    
+
     return highlightedText;
   };
 
@@ -99,9 +105,113 @@ const SlideViewer: React.FC<SlideViewerProps> = ({
     setIsFullscreen(!isFullscreen);
   };
 
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    
+    if (files.length === 0) return;
+
+    const validTypes = [
+      'application/pdf',
+      'application/vnd.ms-powerpoint',
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      'text/plain',
+      'application/vnd.ms-excel',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    ];
+
+    const validFiles = files.filter(file => {
+      const isValidType = validTypes.includes(file.type);
+      const isValidSize = file.size <= 10 * 1024 * 1024; // 10MB limit
+      
+      if (!isValidType) {
+        toast({
+          title: "Invalid File Type",
+          description: `${file.name} is not a supported file type`,
+          variant: "destructive"
+        });
+        return false;
+      }
+      
+      if (!isValidSize) {
+        toast({
+          title: "File Too Large",
+          description: `${file.name} exceeds the 10MB limit`,
+          variant: "destructive"
+        });
+        return false;
+      }
+      
+      return true;
+    });
+
+    if (validFiles.length > 0) {
+      setUploadedFiles(prev => [...prev, ...validFiles]);
+      
+      // Process files and create slides
+      validFiles.forEach((file, index) => {
+        processFile(file, index);
+      });
+
+      toast({
+        title: "Files Uploaded Successfully",
+        description: `${validFiles.length} file(s) processed and ready for presentation`,
+      });
+    }
+
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const processFile = (file: File, index: number) => {
+    const reader = new FileReader();
+    
+    reader.onload = (e) => {
+      const content = e.target?.result as string;
+      
+      // Create a new slide from the uploaded file
+      const newSlide: Slide = {
+        id: slides.length + index + 1,
+        title: `Uploaded: ${file.name}`,
+        content: file.type === 'text/plain' 
+          ? content 
+          : `File: ${file.name} (${(file.size / 1024).toFixed(1)} KB)\n\nType: ${file.type}\n\nThis file has been uploaded and is ready for AI analysis. The system will process the content and generate relevant insights during your presentation.`,
+        keywords: ["uploaded", "document", "analysis", "AI processing"],
+        imageUrl: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=300&fit=crop"
+      };
+      
+      setSlides(prev => [...prev, newSlide]);
+      
+      console.log(`File processed: ${file.name}`, {
+        name: file.name,
+        type: file.type,
+        size: file.size,
+        content: content.substring(0, 100) + '...'
+      });
+    };
+    
+    if (file.type === 'text/plain') {
+      reader.readAsText(file);
+    } else {
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeUploadedFile = (fileToRemove: File) => {
+    setUploadedFiles(prev => prev.filter(file => file !== fileToRemove));
+    
+    // Also remove the corresponding slide
+    setSlides(prev => prev.filter(slide => slide.title !== `Uploaded: ${fileToRemove.name}`));
+    
+    toast({
+      title: "File Removed",
+      description: `${fileToRemove.name} has been removed from the presentation`,
+    });
+  };
+
   const uploadSlides = () => {
-    // Mock file upload
-    console.log('Upload slides functionality would be implemented here');
+    fileInputRef.current?.click();
   };
 
   const current = slides[currentSlide];
@@ -115,21 +225,19 @@ const SlideViewer: React.FC<SlideViewerProps> = ({
             Slide Viewer ({currentSlide + 1} of {slides.length})
           </CardTitle>
           <div className="flex items-center gap-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               onClick={uploadSlides}
-              className="flex items-center gap-1"
-            >
+              className="flex items-center gap-1">
               <Upload className="h-4 w-4" />
-              Upload
+              Upload Files
             </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               onClick={toggleFullscreen}
-              className="flex items-center gap-1"
-            >
+              className="flex items-center gap-1">
               <Eye className="h-4 w-4" />
               {isFullscreen ? 'Exit' : 'Fullscreen'}
             </Button>
@@ -137,12 +245,51 @@ const SlideViewer: React.FC<SlideViewerProps> = ({
         </CardHeader>
         
         <CardContent className="space-y-4">
+          {/* File Upload Input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            accept=".pdf,.ppt,.pptx,.txt,.xls,.xlsx"
+            onChange={handleFileUpload}
+            className="hidden"
+          />
+
+          {/* Uploaded Files Display */}
+          {uploadedFiles.length > 0 && (
+            <div className="mb-4">
+              <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                Uploaded Files ({uploadedFiles.length})
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {uploadedFiles.map((file, index) => (
+                  <Badge 
+                    key={index} 
+                    variant="secondary" 
+                    className="flex items-center gap-1 max-w-xs"
+                  >
+                    <span className="truncate">{file.name}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-4 w-4 p-0 hover:bg-red-100"
+                      onClick={() => removeUploadedFile(file)}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Slide Content */}
           <div className={`${isFullscreen ? 'h-screen p-8' : 'min-h-96'} bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg p-6 flex flex-col justify-center`}>
             {current.imageUrl && (
               <div className="mb-6 flex justify-center">
-                <img 
-                  src={current.imageUrl} 
+                <img
+                  src={current.imageUrl}
                   alt={current.title}
                   className="rounded-lg shadow-lg max-h-48 object-cover"
                 />
@@ -153,8 +300,8 @@ const SlideViewer: React.FC<SlideViewerProps> = ({
               {current.title}
             </h2>
             
-            <div 
-              className={`${isFullscreen ? 'text-xl' : 'text-base'} text-gray-700 leading-relaxed text-center`}
+            <div
+              className={`${isFullscreen ? 'text-xl' : 'text-base'} text-gray-700 leading-relaxed text-center whitespace-pre-line`}
               dangerouslySetInnerHTML={{
                 __html: highlightText(current.content, highlightedKeywords)
               }}
@@ -164,8 +311,8 @@ const SlideViewer: React.FC<SlideViewerProps> = ({
             {current.keywords && (
               <div className="mt-6 flex flex-wrap justify-center gap-2">
                 {current.keywords.map((keyword, index) => (
-                  <Badge 
-                    key={index} 
+                  <Badge
+                    key={index}
                     variant={highlightedKeywords.includes(keyword) ? "default" : "secondary"}
                     className={highlightedKeywords.includes(keyword) ? "bg-yellow-500" : ""}
                   >
@@ -178,12 +325,11 @@ const SlideViewer: React.FC<SlideViewerProps> = ({
           
           {/* Navigation Controls */}
           <div className="flex items-center justify-between">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={prevSlide}
               disabled={currentSlide === 0}
-              className="flex items-center gap-1"
-            >
+              className="flex items-center gap-1">
               <ChevronLeft className="h-4 w-4" />
               Previous
             </Button>
@@ -195,20 +341,19 @@ const SlideViewer: React.FC<SlideViewerProps> = ({
                   key={index}
                   onClick={() => goToSlide(index)}
                   className={`w-3 h-3 rounded-full transition-all ${
-                    index === currentSlide 
-                      ? 'bg-blue-600' 
-                      : 'bg-gray-300 hover:bg-gray-400'
+                    index === currentSlide ?
+                    'bg-blue-600' :
+                    'bg-gray-300 hover:bg-gray-400'
                   }`}
                 />
               ))}
             </div>
             
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={nextSlide}
               disabled={currentSlide === slides.length - 1}
-              className="flex items-center gap-1"
-            >
+              className="flex items-center gap-1">
               Next
               <ChevronRight className="h-4 w-4" />
             </Button>

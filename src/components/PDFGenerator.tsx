@@ -35,24 +35,24 @@ const PDFGenerator: React.FC<PDFGeneratorProps> = ({
 
     // Simulate AI processing steps
     const steps = [
-      'Analyzing transcript...',
-      'Extracting key concepts...',
-      'Organizing content sections...',
-      'Generating summary...',
-      'Creating PDF document...'
-    ];
+    'Analyzing transcript...',
+    'Extracting key concepts...',
+    'Organizing content sections...',
+    'Generating summary...',
+    'Creating PDF document...'];
+
 
     for (let i = 0; i < steps.length; i++) {
-      await new Promise(resolve => setTimeout(resolve, 800));
-      setGenerationProgress(((i + 1) / steps.length) * 100);
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      setGenerationProgress((i + 1) / steps.length * 100);
     }
 
     // Process the transcript into structured sections
     const sections = processTranscriptIntoSections(transcript, slideContent);
-    
+
     // Generate PDF (simplified version without jsPDF)
     await createTextSummary(sections);
-    
+
     setIsGenerating(false);
     setLastGenerated(new Date());
   };
@@ -67,10 +67,10 @@ const PDFGenerator: React.FC<PDFGeneratorProps> = ({
       const startIndex = i * wordsPerSection;
       const endIndex = Math.min((i + 1) * wordsPerSection, words.length);
       const sectionWords = words.slice(startIndex, endIndex);
-      
+
       // Extract section-specific keywords
-      const sectionKeywords = keywords.filter(keyword => 
-        sectionWords.some(word => word.toLowerCase().includes(keyword.toLowerCase()))
+      const sectionKeywords = keywords.filter((keyword) =>
+      sectionWords.some((word) => word.toLowerCase().includes(keyword.toLowerCase()))
       );
 
       sections.push({
@@ -87,10 +87,10 @@ const PDFGenerator: React.FC<PDFGeneratorProps> = ({
   const getSectionTitle = (words: string[]): string => {
     // Simple title extraction - find the most relevant words
     const commonWords = ['the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by'];
-    const meaningfulWords = words
-      .filter(word => word.length > 3 && !commonWords.includes(word.toLowerCase()))
-      .slice(0, 3);
-    
+    const meaningfulWords = words.
+    filter((word) => word.length > 3 && !commonWords.includes(word.toLowerCase())).
+    slice(0, 3);
+
     return meaningfulWords.join(' ') || 'Content Overview';
   };
 
@@ -105,10 +105,10 @@ const PDFGenerator: React.FC<PDFGeneratorProps> = ({
     let summaryContent = `AI-Generated Lecture Summary\n`;
     summaryContent += `Generated on: ${new Date().toLocaleDateString()}\n`;
     summaryContent += `Session Duration: ${Math.floor(sessionDuration / 60)}:${(sessionDuration % 60).toString().padStart(2, '0')}\n\n`;
-    
+
     // Keywords Section
     summaryContent += `Key Topics Covered:\n${keywords.join(', ')}\n\n`;
-    
+
     // Content Sections
     sections.forEach((section) => {
       summaryContent += `${section.title} (${section.timestamp})\n`;
@@ -177,73 +177,73 @@ const PDFGenerator: React.FC<PDFGeneratorProps> = ({
         </div>
 
         {/* Generation Status */}
-        {isGenerating && (
-          <div className="space-y-2">
+        {isGenerating &&
+        <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Generating Summary...</span>
               <span className="text-sm text-gray-600">{Math.round(generationProgress)}%</span>
             </div>
             <Progress value={generationProgress} className="w-full" />
           </div>
-        )}
+        }
 
         {/* Last Generated Info */}
-        {lastGenerated && (
-          <div className="flex items-center gap-2 text-sm text-green-600">
+        {lastGenerated &&
+        <div className="flex items-center gap-2 text-sm text-green-600">
             <CheckCircle className="h-4 w-4" />
             Last generated: {lastGenerated.toLocaleString()}
           </div>
-        )}
+        }
 
         {/* Keywords Preview */}
         <div>
           <h4 className="text-sm font-medium mb-2">Detected Keywords:</h4>
           <div className="flex flex-wrap gap-1">
-            {keywords.slice(0, 8).map((keyword, index) => (
-              <Badge key={index} variant="secondary" className="text-xs">
+            {keywords.slice(0, 8).map((keyword, index) =>
+            <Badge key={index} variant="secondary" className="text-xs">
                 {keyword}
               </Badge>
-            ))}
-            {keywords.length > 8 && (
-              <Badge variant="outline" className="text-xs">
+            )}
+            {keywords.length > 8 &&
+            <Badge variant="outline" className="text-xs">
                 +{keywords.length - 8} more
               </Badge>
-            )}
+            }
           </div>
         </div>
 
         {/* Action Buttons */}
         <div className="flex gap-2">
-          <Button 
+          <Button
             onClick={generateLectureSummary}
             disabled={isGenerating || transcript.length < 100}
-            className="flex-1"
-          >
-            {isGenerating ? (
-              <>
+            className="flex-1">
+
+            {isGenerating ?
+            <>
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                 Generating Summary...
-              </>
-            ) : (
-              <>
+              </> :
+
+            <>
                 <Download className="h-4 w-4 mr-2" />
                 Generate Text Summary
               </>
-            )}
+            }
           </Button>
         </div>
 
         {/* Instructions */}
-        {transcript.length < 100 && (
-          <div className="text-sm text-gray-600 bg-yellow-50 p-3 rounded">
+        {transcript.length < 100 &&
+        <div className="text-sm text-gray-600 bg-yellow-50 p-3 rounded">
             <strong>Note:</strong> Continue speaking to accumulate more content for a comprehensive summary. 
             At least 100 words are recommended for meaningful summary generation.
           </div>
-        )}
+        }
 
         {/* Sample Summary Preview */}
-        {transcript.length >= 100 && (
-          <div className="mt-4">
+        {transcript.length >= 100 &&
+        <div className="mt-4">
             <h4 className="text-sm font-medium mb-2">Summary Preview:</h4>
             <div className="bg-gray-50 p-3 rounded text-sm max-h-32 overflow-y-auto">
               <p className="font-medium">AI-Generated Lecture Summary</p>
@@ -256,10 +256,10 @@ const PDFGenerator: React.FC<PDFGeneratorProps> = ({
               </p>
             </div>
           </div>
-        )}
+        }
       </CardContent>
-    </Card>
-  );
+    </Card>);
+
 };
 
 export default PDFGenerator;

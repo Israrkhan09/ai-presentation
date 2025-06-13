@@ -21,7 +21,7 @@ export const useSpeechRecognition = (): UseSpeechRecognitionReturn => {
   const [isListening, setIsListening] = useState(false);
   const [confidence, setConfidence] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  
+
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const finalTranscriptRef = useRef('');
 
@@ -33,7 +33,7 @@ export const useSpeechRecognition = (): UseSpeechRecognitionReturn => {
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
-    
+
     recognition.continuous = true;
     recognition.interimResults = true;
     recognition.lang = 'en-US';
@@ -52,7 +52,7 @@ export const useSpeechRecognition = (): UseSpeechRecognitionReturn => {
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const result = event.results[i];
         const transcriptText = result[0].transcript;
-        
+
         if (result.isFinal) {
           finalTranscript += transcriptText + ' ';
           setConfidence(result[0].confidence);

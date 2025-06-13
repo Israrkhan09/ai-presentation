@@ -5,17 +5,18 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
-  Play, 
-  Square, 
   Mic, 
   MicOff, 
+  Play, 
+  Pause, 
+  Square, 
+  BarChart3, 
   Brain, 
   FileText, 
-  MessageSquare,
-  Clock,
-  Users,
-  TrendingUp,
-  AlertCircle
+  Volume2,
+  User,
+  LogOut,
+  Settings
 } from 'lucide-react';
 
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
@@ -25,305 +26,333 @@ import QuizGenerator from './QuizGenerator';
 import PDFGenerator from './PDFGenerator';
 import VoiceCommands from './VoiceCommands';
 import SpeakerNotes from './SpeakerNotes';
+import { useUser } from '@/contexts/UserContext';
 
-const PresentationDashboard: React.FC = () => {
-  // Speech recognition state
+const PresentationDashboard = () => {
+  const { user, logout } = useUser();
   const {
-    transcript,
     isListening,
+    transcript,
+    confidence,
     startListening,
     stopListening,
-    resetTranscript,
-    confidence,
-    error
+    resetTranscript
   } = useSpeechRecognition();
 
-  // Presentation state
   const [isPresenting, setIsPresenting] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [sessionDuration, setSessionDuration] = useState(0);
-  const [startTime, setStartTime] = useState<Date | null>(null);
   const [highlightedKeywords, setHighlightedKeywords] = useState<string[]>([]);
-  const [presentationStats, setPresentationStats] = useState({
-    totalSlides: 5,
-    wordsSpoken: 0,
-    averageConfidence: 0,
-    keyTopics: 0
+  const [sessionData, setSessionData] = useState({
+    startTime: null as Date | null,
+    duration: 0,
+    wordCount: 0,
+    keyPoints: [] as string[]
   });
 
-  // Timer effect
+  // Update session data
+  useEffect(() => {
+    if (transcript) {
+      setSessionData(prev => ({
+        ...prev,
+        wordCount: transcript.split(' ').length
+      }));
+    }
+  }, [transcript]);
+
+  // Update duration timer
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    if (isPresenting && startTime) {
+    if (isPresenting && sessionData.startTime) {
       interval = setInterval(() => {
-        setSessionDuration(Math.floor((Date.now() - startTime.getTime()) / 1000));
+        setSessionData(prev => ({
+          ...prev,
+          duration: Math.floor((Date.now() - (prev.startTime?.getTime() || 0)) / 1000)
+        }));
       }, 1000);
     }
     return () => clearInterval(interval);
-  }, [isPresenting, startTime]);
-
-  // Update stats based on transcript
-  useEffect(() => {
-    setPresentationStats(prev => ({
-      ...prev,
-      wordsSpoken: transcript.split(' ').filter(word => word.trim()).length,
-      averageConfidence: Math.round(confidence * 100),
-      keyTopics: highlightedKeywords.length
-    }));
-  }, [transcript, confidence, highlightedKeywords]);
+  }, [isPresenting, sessionData.startTime]);
 
   const startPresentation = () => {
     setIsPresenting(true);
-    setStartTime(new Date());
+    setSessionData(prev => ({
+      ...prev,
+      startTime: new Date()
+    }));
     startListening();
-    setSessionDuration(0);
-    console.log('Presentation started');
+    console.log('Presentation started by:', user?.name);
   };
 
-  const endPresentation = () => {
-    setIsPresenting(false);
-    setStartTime(null);
-    stopListening();
-    console.log('Presentation ended');
-  };
-
-  const handleVoiceCommand = (command: string, action: string) => {
-    console.log('Voice command received:', command, action);
-    
-    switch (action) {
-      case 'NEXT_SLIDE':
-        setCurrentSlide(prev => Math.min(prev + 1, 4));
-        break;
-      case 'PREV_SLIDE':
-        setCurrentSlide(prev => Math.max(prev - 1, 0));
-        break;
-      case 'GO_TO_SLIDE':
-        const slideNumber = parseInt(command.match(/\d+/)?.[0] || '1') - 1;
-        setCurrentSlide(Math.max(0, Math.min(slideNumber, 4)));
-        break;
-      case 'START_PRESENTATION':
-        startPresentation();
-        break;
-      case 'END_PRESENTATION':
-        endPresentation();
-        break;
-      case 'PAUSE_RECORDING':
-        stopListening();
-        break;
-      case 'RESUME_RECORDING':
-        startListening();
-        break;
-      case 'TOGGLE_FULLSCREEN':
-        document.documentElement.requestFullscreen?.();
-        break;
-      default:
-        console.log('Unknown command action:', action);
+  const pausePresentation = () => {
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
     }
   };
 
-  const formatDuration = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+  const stopPresentation = () => {
+    setIsPresenting(false);
+    stopListening();
+    console.log('Presentation stopped');
   };
 
-  const slideContent = [
-    "Introduction to AI-Powered Presentations - Revolutionary technology for modern presentations",
-    "Real-Time Speech Recognition - Advanced natural language processing capabilities",
-    "AI-Generated Content Analysis - Intelligent keyword detection and topic completion",
-    "Interactive Quiz Generation - Automated MCQ and theory-based question creation",
-    "Voice-Controlled Presentation - Hands-free presentation control and navigation"
-  ];
+  const resetSession = () => {
+    setIsPresenting(false);
+    stopListening();
+    resetTranscript();
+    setSessionData({
+      startTime: null,
+      duration: 0,
+      wordCount: 0,
+      keyPoints: []
+    });
+    setCurrentSlide(0);
+    setHighlightedKeywords([]);
+    console.log('Session reset');
+  };
+
+  const handleSlideChange = (slideIndex: number) => {
+    setCurrentSlide(slideIndex);
+    console.log('Slide changed to:', slideIndex + 1);
+  };
+
+  const handleKeywordsHighlight = (keywords: string[]) => {
+    setHighlightedKeywords(keywords);
+  };
+
+  const formatDuration = (seconds: number) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    
+    if (hours > 0) {
+      return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+    return `${minutes}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const handleLogout = () => {
+    logout();
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            AI-Powered Presentation Assistant
-          </h1>
-          <p className="text-gray-600 text-lg">
-            Real-Time Intelligence for Smarter Presentations
-          </p>
-        </div>
-
-        {/* Control Panel */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+      {/* Header with User Info */}
+      <Card className="mb-6">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
-                <Brain className="h-5 w-5" />
-                Presentation Control
+                <User className="h-8 w-8 text-blue-600" />
+                <div>
+                  <h1 className="text-2xl font-bold">Welcome, {user?.name || 'User'}!</h1>
+                  <p className="text-gray-600">
+                    {user?.role && <Badge variant="outline" className="mr-2">{user.role}</Badge>}
+                    AI-Powered Presentation Dashboard
+                  </p>
+                </div>
               </div>
-              <div className="flex items-center gap-4">
-                <Badge variant={isPresenting ? "default" : "secondary"}>
-                  {isPresenting ? "Active" : "Inactive"}
+              {user?.voiceProfileId && (
+                <div className="text-right">
+                  <Badge variant="secondary" className="flex items-center gap-1">
+                    <Volume2 className="h-3 w-3" />
+                    Voice Profile Active
+                  </Badge>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Registered: {new Date(user.registrationDate).toLocaleDateString()}
+                  </p>
+                </div>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" className="flex items-center gap-1">
+                <Settings className="h-4 w-4" />
+                Settings
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleLogout}
+                className="flex items-center gap-1"
+              >
+                <LogOut className="h-4 w-4" />
+                Logout
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+      </Card>
+
+      {/* Main Controls */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <span>Presentation Controls</span>
+            <div className="flex items-center gap-2">
+              {isPresenting && (
+                <Badge variant={isListening ? "default" : "secondary"} className="animate-pulse">
+                  {isListening ? 'Recording' : 'Paused'} - {formatDuration(sessionData.duration)}
                 </Badge>
-                {isPresenting && (
-                  <div className="flex items-center gap-2 text-sm">
-                    <Clock className="h-4 w-4" />
-                    {formatDuration(sessionDuration)}
-                  </div>
-                )}
-              </div>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
+              )}
+            </div>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center gap-4">
+            {!isPresenting ? (
+              <Button
+                onClick={startPresentation}
+                className="flex items-center gap-2"
+                size="lg"
+              >
+                <Play className="h-5 w-5" />
+                Start Presentation
+              </Button>
+            ) : (
+              <>
                 <Button
-                  onClick={isPresenting ? endPresentation : startPresentation}
-                  className={isPresenting ? "bg-red-600 hover:bg-red-700" : "bg-green-600 hover:bg-green-700"}
-                >
-                  {isPresenting ? (
-                    <>
-                      <Square className="h-4 w-4 mr-2" />
-                      End Presentation
-                    </>
-                  ) : (
-                    <>
-                      <Play className="h-4 w-4 mr-2" />
-                      Start Presentation
-                    </>
-                  )}
-                </Button>
-                
-                <Button
-                  onClick={isListening ? stopListening : startListening}
+                  onClick={pausePresentation}
                   variant="outline"
-                  className={isListening ? "border-green-500 text-green-600" : ""}
+                  className="flex items-center gap-2"
                 >
-                  {isListening ? (
-                    <>
-                      <Mic className="h-4 w-4 mr-2" />
-                      Recording
-                    </>
-                  ) : (
-                    <>
-                      <MicOff className="h-4 w-4 mr-2" />
-                      Start Recording
-                    </>
-                  )}
+                  {isListening ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+                  {isListening ? 'Pause' : 'Resume'}
                 </Button>
-
                 <Button
-                  onClick={resetTranscript}
-                  variant="outline"
-                  disabled={!transcript}
+                  onClick={stopPresentation}
+                  variant="destructive"
+                  className="flex items-center gap-2"
                 >
-                  Reset
+                  <Square className="h-4 w-4" />
+                  Stop
                 </Button>
-              </div>
+              </>
+            )}
 
-              {/* Stats */}
-              <div className="flex items-center gap-4 text-sm">
-                <div className="flex items-center gap-1">
-                  <MessageSquare className="h-4 w-4" />
-                  {presentationStats.wordsSpoken} words
+            <Button
+              onClick={resetSession}
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              Reset Session
+            </Button>
+
+            {/* Session Stats */}
+            <div className="flex items-center gap-4 ml-auto">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-blue-600">{sessionData.wordCount}</div>
+                <div className="text-xs text-gray-500">Words</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-600">{currentSlide + 1}</div>
+                <div className="text-xs text-gray-500">Current Slide</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-purple-600">
+                  {confidence ? Math.round(confidence * 100) : 0}%
                 </div>
-                <div className="flex items-center gap-1">
-                  <TrendingUp className="h-4 w-4" />
-                  {presentationStats.averageConfidence}% confidence
-                </div>
-                <div className="flex items-center gap-1">
-                  <Users className="h-4 w-4" />
-                  {presentationStats.keyTopics} topics
-                </div>
+                <div className="text-xs text-gray-500">Confidence</div>
               </div>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Error Alert */}
-        {error && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-
-        {/* Main Dashboard */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - Slides and AI */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Slide Viewer */}
-            <SlideViewer
-              highlightedKeywords={highlightedKeywords}
-              onSlideChange={setCurrentSlide}
-              autoAdvance={isPresenting}
-            />
-
-            {/* AI Processor */}
-            <AIProcessor
-              transcript={transcript}
-              onKeywordsDetected={setHighlightedKeywords}
-              onSlideAdvance={() => setCurrentSlide(prev => Math.min(prev + 1, 4))}
-              onTopicComplete={(topic) => console.log('Topic completed:', topic)}
-            />
           </div>
 
-          {/* Right Column - Tools */}
-          <div className="space-y-6">
-            {/* Speaker Notes */}
-            <SpeakerNotes
-              currentSlide={currentSlide}
-              slideContent={slideContent}
-              transcript={transcript}
-              onNotesUpdate={(notes) => console.log('Notes updated:', notes)}
-            />
-
-            {/* Voice Commands */}
-            <VoiceCommands
-              onCommand={handleVoiceCommand}
-              isListening={isListening}
-            />
-          </div>
-        </div>
-
-        {/* Bottom Section - Advanced Features */}
-        <Tabs defaultValue="quiz" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="quiz">Quiz Generator</TabsTrigger>
-            <TabsTrigger value="summary">PDF Summary</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="quiz">
-            <QuizGenerator
-              transcript={transcript}
-              slideContent={slideContent}
-              onQuizGenerated={(mcqs, theory) => console.log('Quiz generated:', { mcqs, theory })}
-            />
-          </TabsContent>
-          
-          <TabsContent value="summary">
-            <PDFGenerator
-              transcript={transcript}
-              slideContent={slideContent}
-              keywords={highlightedKeywords}
-              sessionDuration={sessionDuration}
-            />
-          </TabsContent>
-        </Tabs>
-
-        {/* Live Transcript (for debugging) */}
-        {transcript && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5" />
-                Live Transcript
-                <Badge variant="outline">{confidence > 0 ? `${Math.round(confidence * 100)}% confidence` : ''}</Badge>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="bg-gray-50 p-4 rounded max-h-32 overflow-y-auto">
-                <p className="text-sm text-gray-700">{transcript}</p>
+          {/* Voice Recognition Status */}
+          {isPresenting && (
+            <Alert className="mt-4">
+              <div className="flex items-center gap-2">
+                {isListening ? (
+                  <Mic className="h-4 w-4 text-green-600" />
+                ) : (
+                  <MicOff className="h-4 w-4 text-red-600" />
+                )}
+                <AlertDescription>
+                  {isListening 
+                    ? `Listening... Confidence: ${confidence ? Math.round(confidence * 100) : 0}%`
+                    : 'Speech recognition paused'
+                  }
+                </AlertDescription>
               </div>
-            </CardContent>
-          </Card>
-        )}
-      </div>
+            </Alert>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Main Dashboard */}
+      <Tabs defaultValue="slides" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-6">
+          <TabsTrigger value="slides" className="flex items-center gap-2">
+            <FileText className="h-4 w-4" />
+            Slides
+          </TabsTrigger>
+          <TabsTrigger value="ai" className="flex items-center gap-2">
+            <Brain className="h-4 w-4" />
+            AI Analysis
+          </TabsTrigger>
+          <TabsTrigger value="quiz" className="flex items-center gap-2">
+            <BarChart3 className="h-4 w-4" />
+            Quiz
+          </TabsTrigger>
+          <TabsTrigger value="pdf" className="flex items-center gap-2">
+            <FileText className="h-4 w-4" />
+            Export
+          </TabsTrigger>
+          <TabsTrigger value="voice" className="flex items-center gap-2">
+            <Volume2 className="h-4 w-4" />
+            Voice Control
+          </TabsTrigger>
+          <TabsTrigger value="notes" className="flex items-center gap-2">
+            <FileText className="h-4 w-4" />
+            Notes
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="slides">
+          <SlideViewer
+            highlightedKeywords={highlightedKeywords}
+            onSlideChange={handleSlideChange}
+            autoAdvance={false}
+          />
+        </TabsContent>
+
+        <TabsContent value="ai">
+          <AIProcessor
+            transcript={transcript}
+            isProcessing={isListening}
+            onKeywordsExtracted={handleKeywordsHighlight}
+          />
+        </TabsContent>
+
+        <TabsContent value="quiz">
+          <QuizGenerator transcript={transcript} />
+        </TabsContent>
+
+        <TabsContent value="pdf">
+          <PDFGenerator
+            transcript={transcript}
+            sessionData={{
+              ...sessionData,
+              currentSlide: currentSlide + 1,
+              userName: user?.name || 'Unknown User',
+              userRole: user?.role || 'Presenter'
+            }}
+          />
+        </TabsContent>
+
+        <TabsContent value="voice">
+          <VoiceCommands
+            isListening={isListening}
+            transcript={transcript}
+          />
+        </TabsContent>
+
+        <TabsContent value="notes">
+          <SpeakerNotes
+            transcript={transcript}
+            currentSlide={currentSlide}
+          />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
