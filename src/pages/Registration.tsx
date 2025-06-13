@@ -16,7 +16,7 @@ const Registration = () => {
   const { register, isLoading } = useUser();
   const navigate = useNavigate();
   const { toast } = useToast();
-  
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -25,22 +25,22 @@ const Registration = () => {
     role: '',
     voiceProfileData: ''
   });
-  
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isRegistered, setIsRegistered] = useState(false);
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
     // Clear error when user starts typing
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
+      setErrors((prev) => ({ ...prev, [field]: '' }));
     }
   };
 
   const handleVoiceRecording = (audioData: string) => {
-    setFormData(prev => ({ ...prev, voiceProfileData: audioData }));
+    setFormData((prev) => ({ ...prev, voiceProfileData: audioData }));
     if (errors.voiceProfileData) {
-      setErrors(prev => ({ ...prev, voiceProfileData: '' }));
+      setErrors((prev) => ({ ...prev, voiceProfileData: '' }));
     }
   };
 
@@ -81,7 +81,7 @@ const Registration = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       toast({
         title: "Validation Error",
@@ -104,7 +104,7 @@ const Registration = () => {
         setIsRegistered(true);
         toast({
           title: "Registration Successful!",
-          description: "You have been successfully registered",
+          description: "You have been successfully registered"
         });
       }
     } catch (error) {
@@ -141,18 +141,18 @@ const Registration = () => {
               </AlertDescription>
             </Alert>
             
-            <Button 
+            <Button
               onClick={goToLogin}
               className="w-full flex items-center gap-2"
-              size="lg"
-            >
+              size="lg">
+
               Proceed to Login
               <ArrowRight className="h-4 w-4" />
             </Button>
           </CardContent>
         </Card>
-      </div>
-    );
+      </div>);
+
   }
 
   return (
@@ -186,8 +186,8 @@ const Registration = () => {
                     value={formData.name}
                     onChange={(e) => handleInputChange('name', e.target.value)}
                     placeholder="Enter your full name"
-                    className={errors.name ? 'border-red-500' : ''}
-                  />
+                    className={errors.name ? 'border-red-500' : ''} />
+
                   {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
                 </div>
                 
@@ -218,8 +218,8 @@ const Registration = () => {
                   value={formData.email}
                   onChange={(e) => handleInputChange('email', e.target.value)}
                   placeholder="Enter your email address"
-                  className={errors.email ? 'border-red-500' : ''}
-                />
+                  className={errors.email ? 'border-red-500' : ''} />
+
                 {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
               </div>
               
@@ -232,8 +232,8 @@ const Registration = () => {
                     value={formData.password}
                     onChange={(e) => handleInputChange('password', e.target.value)}
                     placeholder="Enter password (min 6 characters)"
-                    className={errors.password ? 'border-red-500' : ''}
-                  />
+                    className={errors.password ? 'border-red-500' : ''} />
+
                   {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
                 </div>
                 
@@ -245,8 +245,8 @@ const Registration = () => {
                     value={formData.confirmPassword}
                     onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
                     placeholder="Confirm your password"
-                    className={errors.confirmPassword ? 'border-red-500' : ''}
-                  />
+                    className={errors.confirmPassword ? 'border-red-500' : ''} />
+
                   {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>}
                 </div>
               </div>
@@ -259,40 +259,40 @@ const Registration = () => {
                 <span className="font-semibold">Voice Enrollment</span>
               </div>
               
-              <VoiceRecorder 
+              <VoiceRecorder
                 onRecordingComplete={handleVoiceRecording}
-                isRequired={true}
-              />
-              {errors.voiceProfileData && (
-                <p className="text-red-500 text-sm mt-1">{errors.voiceProfileData}</p>
-              )}
+                isRequired={true} />
+
+              {errors.voiceProfileData &&
+              <p className="text-red-500 text-sm mt-1">{errors.voiceProfileData}</p>
+              }
             </div>
 
             {/* Submit Button */}
-            <Button 
-              type="submit" 
-              className="w-full" 
+            <Button
+              type="submit"
+              className="w-full"
               size="lg"
-              disabled={isLoading}
-            >
+              disabled={isLoading}>
+
               {isLoading ? 'Registering...' : 'Complete Registration'}
             </Button>
             
             <div className="text-center">
-              <Button 
+              <Button
                 type="button"
-                variant="link" 
+                variant="link"
                 onClick={goToLogin}
-                className="text-blue-600 hover:text-blue-800"
-              >
+                className="text-blue-600 hover:text-blue-800">
+
                 Already have an account? Login here
               </Button>
             </div>
           </form>
         </CardContent>
       </Card>
-    </div>
-  );
+    </div>);
+
 };
 
 export default Registration;
