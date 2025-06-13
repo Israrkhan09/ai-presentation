@@ -5,20 +5,20 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { 
-  Play, 
-  Pause, 
-  Mic, 
-  MicOff, 
-  ChevronLeft, 
-  ChevronRight, 
+import {
+  Play,
+  Pause,
+  Mic,
+  MicOff,
+  ChevronLeft,
+  ChevronRight,
   Square,
   Volume2,
   Sparkles,
   FileText,
   Download,
-  RotateCcw
-} from 'lucide-react';
+  RotateCcw } from
+'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { motion } from 'motion/react';
 
@@ -50,32 +50,32 @@ const EnhancedVoiceViewer: React.FC<EnhancedVoiceViewerProps> = ({ presentation,
 
   // Mock slide content for demonstration
   const mockSlideContent = [
-    {
-      title: "Welcome to Our Presentation",
-      content: "Introduction to voice-controlled presentations with AI assistance",
-      keywords: ["welcome", "introduction", "voice", "AI", "presentation"]
-    },
-    {
-      title: "Key Features",
-      content: "Voice navigation, keyword highlighting, automatic speaker notes generation",
-      keywords: ["features", "voice", "navigation", "keywords", "notes", "automatic"]
-    },
-    {
-      title: "How It Works",
-      content: "Speak naturally and the system will follow your presentation flow",
-      keywords: ["how", "works", "speak", "naturally", "system", "flow"]
-    },
-    {
-      title: "Benefits",
-      content: "Hands-free presentation, engaging audience interaction, real-time feedback",
-      keywords: ["benefits", "hands-free", "engaging", "audience", "interaction", "feedback"]
-    },
-    {
-      title: "Thank You",
-      content: "Questions and discussion time",
-      keywords: ["thank", "questions", "discussion", "time"]
-    }
-  ];
+  {
+    title: "Welcome to Our Presentation",
+    content: "Introduction to voice-controlled presentations with AI assistance",
+    keywords: ["welcome", "introduction", "voice", "AI", "presentation"]
+  },
+  {
+    title: "Key Features",
+    content: "Voice navigation, keyword highlighting, automatic speaker notes generation",
+    keywords: ["features", "voice", "navigation", "keywords", "notes", "automatic"]
+  },
+  {
+    title: "How It Works",
+    content: "Speak naturally and the system will follow your presentation flow",
+    keywords: ["how", "works", "speak", "naturally", "system", "flow"]
+  },
+  {
+    title: "Benefits",
+    content: "Hands-free presentation, engaging audience interaction, real-time feedback",
+    keywords: ["benefits", "hands-free", "engaging", "audience", "interaction", "feedback"]
+  },
+  {
+    title: "Thank You",
+    content: "Questions and discussion time",
+    keywords: ["thank", "questions", "discussion", "time"]
+  }];
+
 
   const getCurrentSlideData = () => {
     const index = Math.min(currentSlide - 1, mockSlideContent.length - 1);
@@ -86,7 +86,7 @@ const EnhancedVoiceViewer: React.FC<EnhancedVoiceViewerProps> = ({ presentation,
     let interval: NodeJS.Timeout;
     if (isPresenting) {
       interval = setInterval(() => {
-        setSessionTime(prev => prev + 1);
+        setSessionTime((prev) => prev + 1);
       }, 1000);
     }
     return () => clearInterval(interval);
@@ -126,7 +126,7 @@ const EnhancedVoiceViewer: React.FC<EnhancedVoiceViewerProps> = ({ presentation,
 
   const processVoiceCommands = (text: string) => {
     const lowerText = text.toLowerCase();
-    
+
     if (lowerText.includes('next slide') || lowerText.includes('next page')) {
       nextSlide();
     } else if (lowerText.includes('previous slide') || lowerText.includes('back slide') || lowerText.includes('go back')) {
@@ -140,14 +140,14 @@ const EnhancedVoiceViewer: React.FC<EnhancedVoiceViewerProps> = ({ presentation,
 
   const detectKeywords = (text: string) => {
     const slideData = getCurrentSlideData();
-    const detectedKeywords = slideData.keywords.filter(keyword => 
-      text.toLowerCase().includes(keyword.toLowerCase())
+    const detectedKeywords = slideData.keywords.filter((keyword) =>
+    text.toLowerCase().includes(keyword.toLowerCase())
     );
-    
+
     if (detectedKeywords.length > 0) {
       setKeywords(detectedKeywords);
       setHighlightedText(detectedKeywords.join(', '));
-      
+
       // Generate speaker notes based on current context
       generateSpeakerNotes(slideData, detectedKeywords);
     }
@@ -158,7 +158,7 @@ const EnhancedVoiceViewer: React.FC<EnhancedVoiceViewerProps> = ({ presentation,
 Current Slide: ${slideData.title}
 
 Key Points Mentioned:
-${detectedKeywords.map(k => `• ${k.charAt(0).toUpperCase() + k.slice(1)}`).join('\n')}
+${detectedKeywords.map((k) => `• ${k.charAt(0).toUpperCase() + k.slice(1)}`).join('\n')}
 
 Suggested Continuation:
 • Elaborate on ${detectedKeywords[0] || 'main topic'}
@@ -168,7 +168,7 @@ Suggested Continuation:
 
 Time Spent: ${Math.floor(sessionTime / 60)}:${(sessionTime % 60).toString().padStart(2, '0')}
     `.trim();
-    
+
     setSpeakerNotes(notes);
   };
 
@@ -178,7 +178,7 @@ Time Spent: ${Math.floor(sessionTime / 60)}:${(sessionTime % 60).toString().padS
     startListening();
     toast({
       title: "Presentation Started!",
-      description: "Voice control is now active. Speak naturally to navigate.",
+      description: "Voice control is now active. Speak naturally to navigate."
     });
   };
 
@@ -188,7 +188,7 @@ Time Spent: ${Math.floor(sessionTime / 60)}:${(sessionTime % 60).toString().padS
     onEndSession();
     toast({
       title: "Session Ended",
-      description: "Your presentation session has been completed.",
+      description: "Your presentation session has been completed."
     });
   };
 
@@ -202,7 +202,7 @@ Time Spent: ${Math.floor(sessionTime / 60)}:${(sessionTime % 60).toString().padS
         toast({
           title: "Voice Recognition Error",
           description: "Could not start voice recognition. Please check microphone permissions.",
-          variant: "destructive",
+          variant: "destructive"
         });
       }
     }
@@ -217,20 +217,20 @@ Time Spent: ${Math.floor(sessionTime / 60)}:${(sessionTime % 60).toString().padS
 
   const nextSlide = () => {
     if (currentSlide < presentation.total_pages) {
-      setCurrentSlide(prev => prev + 1);
+      setCurrentSlide((prev) => prev + 1);
       toast({
         title: "Next Slide",
-        description: `Moved to slide ${currentSlide + 1}`,
+        description: `Moved to slide ${currentSlide + 1}`
       });
     }
   };
 
   const previousSlide = () => {
     if (currentSlide > 1) {
-      setCurrentSlide(prev => prev - 1);
+      setCurrentSlide((prev) => prev - 1);
       toast({
         title: "Previous Slide",
-        description: `Moved to slide ${currentSlide - 1}`,
+        description: `Moved to slide ${currentSlide - 1}`
       });
     }
   };
@@ -251,7 +251,7 @@ Time Spent: ${Math.floor(sessionTime / 60)}:${(sessionTime % 60).toString().padS
 - Slides Covered: ${currentSlide}
 
 ## Key Topics Discussed
-${keywords.map(k => `• ${k.charAt(0).toUpperCase() + k.slice(1)}`).join('\n')}
+${keywords.map((k) => `• ${k.charAt(0).toUpperCase() + k.slice(1)}`).join('\n')}
 
 ## Transcript Highlights
 ${transcript.split('.').slice(0, 3).join('. ')}...
@@ -279,7 +279,7 @@ Generated by AI Voice Presentation Platform
 
     toast({
       title: "Summary Generated!",
-      description: "AI-generated summary has been downloaded.",
+      description: "AI-generated summary has been downloaded."
     });
   };
 
@@ -334,7 +334,7 @@ Generated Quiz based on session content
 
     toast({
       title: "Quiz Generated!",
-      description: "AI-generated quiz has been downloaded.",
+      description: "AI-generated quiz has been downloaded."
     });
   };
 
@@ -352,12 +352,12 @@ Generated Quiz based on session content
                 {presentation.title}
               </CardTitle>
               <div className="flex items-center gap-2">
-                {isPresenting && (
-                  <Badge variant="destructive" className="animate-pulse">
+                {isPresenting &&
+                <Badge variant="destructive" className="animate-pulse">
                     <Volume2 className="h-3 w-3 mr-1" />
                     LIVE
                   </Badge>
-                )}
+                }
                 <Badge variant="outline">
                   {currentSlide} / {presentation.total_pages}
                 </Badge>
@@ -370,21 +370,21 @@ Generated Quiz based on session content
               key={currentSlide}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="bg-gradient-to-br from-blue-50 to-purple-50 p-8 rounded-lg h-96 flex flex-col justify-center items-center text-center border-2 border-dashed border-blue-200"
-            >
+              className="bg-gradient-to-br from-blue-50 to-purple-50 p-8 rounded-lg h-96 flex flex-col justify-center items-center text-center border-2 border-dashed border-blue-200">
+
               <h2 className="text-2xl font-bold mb-4 text-gray-800">
                 {slideData.title}
               </h2>
               <p className="text-gray-600 mb-6">
                 {slideData.content}
               </p>
-              {highlightedText && (
-                <div className="bg-yellow-100 border border-yellow-300 rounded-lg p-3">
+              {highlightedText &&
+              <div className="bg-yellow-100 border border-yellow-300 rounded-lg p-3">
                   <p className="text-sm font-medium text-yellow-800">
                     Highlighted: {highlightedText}
                   </p>
                 </div>
-              )}
+              }
             </motion.div>
 
             {/* Controls */}
@@ -394,32 +394,32 @@ Generated Quiz based on session content
                   onClick={previousSlide}
                   disabled={currentSlide === 1}
                   variant="outline"
-                  size="sm"
-                >
+                  size="sm">
+
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
                 <Button
                   onClick={nextSlide}
                   disabled={currentSlide === presentation.total_pages}
                   variant="outline"
-                  size="sm"
-                >
+                  size="sm">
+
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>
 
               <div className="flex gap-2">
-                {!isPresenting ? (
-                  <Button onClick={startPresentation} className="bg-green-600 hover:bg-green-700">
+                {!isPresenting ?
+                <Button onClick={startPresentation} className="bg-green-600 hover:bg-green-700">
                     <Play className="h-4 w-4 mr-2" />
                     Start Presentation
-                  </Button>
-                ) : (
-                  <>
+                  </Button> :
+
+                <>
                     <Button
-                      onClick={isListening ? stopListening : startListening}
-                      variant={isListening ? "destructive" : "default"}
-                    >
+                    onClick={isListening ? stopListening : startListening}
+                    variant={isListening ? "destructive" : "default"}>
+
                       {isListening ? <MicOff className="h-4 w-4 mr-2" /> : <Mic className="h-4 w-4 mr-2" />}
                       {isListening ? 'Stop Voice' : 'Start Voice'}
                     </Button>
@@ -428,7 +428,7 @@ Generated Quiz based on session content
                       End Session
                     </Button>
                   </>
-                )}
+                }
               </div>
             </div>
           </CardContent>
@@ -452,29 +452,29 @@ Generated Quiz based on session content
             </div>
             <div className="flex justify-between text-sm">
               <span>Progress:</span>
-              <span>{Math.round((currentSlide / presentation.total_pages) * 100)}%</span>
+              <span>{Math.round(currentSlide / presentation.total_pages * 100)}%</span>
             </div>
-            <Progress value={(currentSlide / presentation.total_pages) * 100} className="h-2" />
+            <Progress value={currentSlide / presentation.total_pages * 100} className="h-2" />
           </CardContent>
         </Card>
 
         {/* Keywords */}
-        {keywords.length > 0 && (
-          <Card className="border-0 shadow-lg">
+        {keywords.length > 0 &&
+        <Card className="border-0 shadow-lg">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm">Live Keywords</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex flex-wrap gap-1">
-                {keywords.map((keyword, index) => (
-                  <Badge key={index} variant="secondary" className="text-xs">
+                {keywords.map((keyword, index) =>
+              <Badge key={index} variant="secondary" className="text-xs">
                     {keyword}
                   </Badge>
-                ))}
+              )}
               </div>
             </CardContent>
           </Card>
-        )}
+        }
 
         {/* Speaker Notes */}
         <Card className="border-0 shadow-lg">
@@ -491,8 +491,8 @@ Generated Quiz based on session content
         </Card>
 
         {/* Live Transcript */}
-        {isListening && (
-          <Card className="border-0 shadow-lg">
+        {isListening &&
+        <Card className="border-0 shadow-lg">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm flex items-center gap-2">
                 <Mic className="h-4 w-4" />
@@ -507,11 +507,11 @@ Generated Quiz based on session content
               </ScrollArea>
             </CardContent>
           </Card>
-        )}
+        }
 
         {/* AI Actions */}
-        {isPresenting && (
-          <Card className="border-0 shadow-lg">
+        {isPresenting &&
+        <Card className="border-0 shadow-lg">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm">AI Actions</CardTitle>
             </CardHeader>
@@ -526,10 +526,10 @@ Generated Quiz based on session content
               </Button>
             </CardContent>
           </Card>
-        )}
+        }
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default EnhancedVoiceViewer;

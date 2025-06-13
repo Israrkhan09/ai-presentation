@@ -39,12 +39,12 @@ const VoiceEnrollment: React.FC<VoiceEnrollmentProps> = ({ onVoiceEnrolled }) =>
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
         audioUrlRef.current = URL.createObjectURL(audioBlob);
         setHasRecording(true);
-        stream.getTracks().forEach(track => track.stop());
+        stream.getTracks().forEach((track) => track.stop());
       };
 
       mediaRecorder.start();
       setIsRecording(true);
-      
+
       // Progress simulation
       let progress = 0;
       const interval = setInterval(() => {
@@ -80,7 +80,7 @@ const VoiceEnrollment: React.FC<VoiceEnrollmentProps> = ({ onVoiceEnrolled }) =>
       audioRef.current = new Audio(audioUrlRef.current);
       audioRef.current.play();
       setIsPlaying(true);
-      
+
       audioRef.current.onended = () => {
         setIsPlaying(false);
       };
@@ -112,7 +112,7 @@ const VoiceEnrollment: React.FC<VoiceEnrollmentProps> = ({ onVoiceEnrolled }) =>
       setIsEnrolled(true);
       toast({
         title: "Voice Enrolled Successfully!",
-        description: "Your voice profile has been created and saved.",
+        description: "Your voice profile has been created and saved."
       });
     }
   };
@@ -131,8 +131,8 @@ const VoiceEnrollment: React.FC<VoiceEnrollmentProps> = ({ onVoiceEnrolled }) =>
           <p className="text-sm text-blue-700 italic">{sampleText}</p>
         </div>
 
-        {isRecording && (
-          <div className="space-y-2">
+        {isRecording &&
+        <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Recording...</span>
               <Badge variant="destructive" className="animate-pulse">
@@ -142,30 +142,30 @@ const VoiceEnrollment: React.FC<VoiceEnrollmentProps> = ({ onVoiceEnrolled }) =>
             </div>
             <Progress value={recordingProgress} className="w-full" />
           </div>
-        )}
+        }
 
         <div className="flex gap-2 flex-wrap">
-          {!hasRecording && !isRecording && (
-            <Button onClick={startRecording} className="flex items-center gap-2">
+          {!hasRecording && !isRecording &&
+          <Button onClick={startRecording} className="flex items-center gap-2">
               <Mic className="h-4 w-4" />
               Start Recording
             </Button>
-          )}
+          }
 
-          {isRecording && (
-            <Button onClick={stopRecording} variant="destructive" className="flex items-center gap-2">
+          {isRecording &&
+          <Button onClick={stopRecording} variant="destructive" className="flex items-center gap-2">
               <MicOff className="h-4 w-4" />
               Stop Recording
             </Button>
-          )}
+          }
 
-          {hasRecording && !isEnrolled && (
-            <>
-              <Button 
-                onClick={isPlaying ? pausePlayback : playRecording}
-                variant="outline"
-                className="flex items-center gap-2"
-              >
+          {hasRecording && !isEnrolled &&
+          <>
+              <Button
+              onClick={isPlaying ? pausePlayback : playRecording}
+              variant="outline"
+              className="flex items-center gap-2">
+
                 {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
                 {isPlaying ? 'Pause' : 'Play Recording'}
               </Button>
@@ -179,11 +179,11 @@ const VoiceEnrollment: React.FC<VoiceEnrollmentProps> = ({ onVoiceEnrolled }) =>
                 Confirm Enrollment
               </Button>
             </>
-          )}
+          }
         </div>
 
-        {isEnrolled && (
-          <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+        {isEnrolled &&
+        <div className="bg-green-50 p-4 rounded-lg border border-green-200">
             <div className="flex items-center gap-2">
               <Badge variant="default" className="bg-green-100 text-green-800">
                 ✓ Voice Profile Created
@@ -193,10 +193,10 @@ const VoiceEnrollment: React.FC<VoiceEnrollmentProps> = ({ onVoiceEnrolled }) =>
               Your voice has been successfully enrolled and your profile is ready!
             </p>
           </div>
-        )}
+        }
       </CardContent>
-    </Card>
-  );
+    </Card>);
+
 };
 
 export default VoiceEnrollment;

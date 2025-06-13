@@ -22,7 +22,7 @@ const Login: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: value
     }));
@@ -30,7 +30,7 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.email.trim() || !formData.password) {
       setError('Please fill in all fields');
       return;
@@ -41,7 +41,7 @@ const Login: React.FC = () => {
 
     try {
       console.log('Attempting login with:', formData.email);
-      
+
       const response = await window.ezsite.apis.login({
         email: formData.email,
         password: formData.password
@@ -55,12 +55,12 @@ const Login: React.FC = () => {
       const userResponse = await window.ezsite.apis.getUserInfo();
       if (userResponse.data && !userResponse.error) {
         login(userResponse.data);
-        
+
         toast({
           title: "Welcome back!",
-          description: `Hello ${userResponse.data.Name || userResponse.data.Email}! Ready to create amazing presentations?`,
+          description: `Hello ${userResponse.data.Name || userResponse.data.Email}! Ready to create amazing presentations?`
         });
-        
+
         navigate('/dashboard');
       } else {
         throw new Error('Failed to get user information');
@@ -95,11 +95,11 @@ const Login: React.FC = () => {
             </p>
           </CardHeader>
           <CardContent className="space-y-6">
-            {error && (
-              <Alert className="border-red-200 bg-red-50">
+            {error &&
+            <Alert className="border-red-200 bg-red-50">
                 <AlertDescription className="text-red-800">{error}</AlertDescription>
               </Alert>
-            )}
+            }
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
@@ -115,8 +115,8 @@ const Login: React.FC = () => {
                   value={formData.email}
                   onChange={handleInputChange}
                   className="transition-all duration-200 focus:ring-2 focus:ring-blue-500"
-                  disabled={isLoading}
-                />
+                  disabled={isLoading} />
+
               </div>
 
               <div className="space-y-2">
@@ -132,15 +132,15 @@ const Login: React.FC = () => {
                   value={formData.password}
                   onChange={handleInputChange}
                   className="transition-all duration-200 focus:ring-2 focus:ring-blue-500"
-                  disabled={isLoading}
-                />
+                  disabled={isLoading} />
+
               </div>
 
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-                disabled={isLoading}
-              >
+                disabled={isLoading}>
+
                 {isLoading ? 'Signing in...' : 'Sign In'}
               </Button>
             </form>
@@ -163,8 +163,8 @@ const Login: React.FC = () => {
                 Don't have an account?{' '}
                 <button
                   onClick={() => navigate('/register')}
-                  className="text-blue-600 hover:text-blue-800 font-medium"
-                >
+                  className="text-blue-600 hover:text-blue-800 font-medium">
+
                   Create one here
                 </button>
               </div>
@@ -173,16 +173,16 @@ const Login: React.FC = () => {
             <div className="text-center">
               <button
                 onClick={() => {/* Handle forgot password */}}
-                className="text-sm text-blue-600 hover:text-blue-800"
-              >
+                className="text-sm text-blue-600 hover:text-blue-800">
+
                 Forgot your password?
               </button>
             </div>
           </CardContent>
         </Card>
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default Login;
