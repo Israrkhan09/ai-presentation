@@ -21,7 +21,7 @@ const VoiceSetupPage = () => {
   "Please say: 'Next slide'",
   "Please say: 'Previous slide'",
   "Please say: 'Start presentation'",
-  "Please say: 'End presentation'",
+  "Please say: 'Stop presentation'",
   "Please say: 'Go to slide number 5'"];
 
 
