@@ -13,19 +13,19 @@ const Login = () => {
   const { login, isLoading } = useUser();
   const navigate = useNavigate();
   const { toast } = useToast();
-  
+
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
-  
+
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
     // Clear error when user starts typing
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
+      setErrors((prev) => ({ ...prev, [field]: '' }));
     }
   };
 
@@ -48,18 +48,18 @@ const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
 
     try {
       const success = await login(formData.email, formData.password);
-      
+
       if (success) {
         toast({
           title: "Login Successful!",
-          description: "Welcome back! Redirecting to your dashboard...",
+          description: "Welcome back! Redirecting to your dashboard..."
         });
         navigate('/dashboard');
       }
@@ -103,8 +103,8 @@ const Login = () => {
                 value={formData.email}
                 onChange={(e) => handleInputChange('email', e.target.value)}
                 placeholder="Enter your email address"
-                className={errors.email ? 'border-red-500' : ''}
-              />
+                className={errors.email ? 'border-red-500' : ''} />
+
               {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
             </div>
             
@@ -119,27 +119,27 @@ const Login = () => {
                 value={formData.password}
                 onChange={(e) => handleInputChange('password', e.target.value)}
                 placeholder="Enter your password"
-                className={errors.password ? 'border-red-500' : ''}
-              />
+                className={errors.password ? 'border-red-500' : ''} />
+
               {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
             </div>
 
-            <Button 
-              type="submit" 
-              className="w-full" 
+            <Button
+              type="submit"
+              className="w-full"
               size="lg"
-              disabled={isLoading}
-            >
+              disabled={isLoading}>
+
               {isLoading ? 'Signing In...' : 'Sign In'}
             </Button>
             
             <div className="text-center space-y-2">
-              <Button 
+              <Button
                 type="button"
-                variant="link" 
+                variant="link"
                 onClick={goToRegister}
-                className="text-blue-600 hover:text-blue-800"
-              >
+                className="text-blue-600 hover:text-blue-800">
+
                 Don't have an account? Register here
               </Button>
             </div>
@@ -153,8 +153,8 @@ const Login = () => {
           </Alert>
         </CardContent>
       </Card>
-    </div>
-  );
+    </div>);
+
 };
 
 export default Login;

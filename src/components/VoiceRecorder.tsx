@@ -9,16 +9,16 @@ interface VoiceRecorderProps {
   isRequired?: boolean;
 }
 
-const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ 
-  onRecordingComplete, 
-  isRequired = false 
+const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
+  onRecordingComplete,
+  isRequired = false
 }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [hasRecording, setHasRecording] = useState(false);
   const [audioURL, setAudioURL] = useState<string>('');
-  
+
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -35,22 +35,22 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      
+
       mediaRecorderRef.current = new MediaRecorder(stream);
       chunksRef.current = [];
-      
+
       mediaRecorderRef.current.ondataavailable = (event) => {
         if (event.data.size > 0) {
           chunksRef.current.push(event.data);
         }
       };
-      
+
       mediaRecorderRef.current.onstop = () => {
         const audioBlob = new Blob(chunksRef.current, { type: 'audio/wav' });
         const url = URL.createObjectURL(audioBlob);
         setAudioURL(url);
         setHasRecording(true);
-        
+
         // Convert to base64 for storage
         const reader = new FileReader();
         reader.onloadend = () => {
@@ -58,20 +58,20 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
           onRecordingComplete(base64data);
         };
         reader.readAsDataURL(audioBlob);
-        
+
         // Stop all tracks
-        stream.getTracks().forEach(track => track.stop());
+        stream.getTracks().forEach((track) => track.stop());
       };
-      
+
       mediaRecorderRef.current.start();
       setIsRecording(true);
       setRecordingTime(0);
-      
+
       // Start timer
       timerRef.current = setInterval(() => {
-        setRecordingTime(prev => prev + 1);
+        setRecordingTime((prev) => prev + 1);
       }, 1000);
-      
+
       console.log('Voice recording started');
     } catch (error) {
       console.error('Error starting recording:', error);
@@ -83,12 +83,12 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
-      
+
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
       }
-      
+
       console.log('Voice recording stopped');
     }
   };
@@ -98,7 +98,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
       audioRef.current = new Audio(audioURL);
       audioRef.current.play();
       setIsPlaying(true);
-      
+
       audioRef.current.onended = () => {
         setIsPlaying(false);
       };
@@ -113,12 +113,12 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
     setAudioURL('');
     setRecordingTime(0);
     setIsPlaying(false);
-    
+
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current = null;
     }
-    
+
     onRecordingComplete('');
   };
 
@@ -150,64 +150,64 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
         <div className="flex flex-col items-center space-y-4">
           {/* Recording Status */}
           <div className="flex items-center gap-4">
-            {isRecording && (
-              <Badge variant="destructive" className="animate-pulse">
+            {isRecording &&
+            <Badge variant="destructive" className="animate-pulse">
                 Recording... {formatTime(recordingTime)}
               </Badge>
-            )}
-            {hasRecording && !isRecording && (
-              <Badge variant="secondary">
+            }
+            {hasRecording && !isRecording &&
+            <Badge variant="secondary">
                 Recording saved ({formatTime(recordingTime)})
               </Badge>
-            )}
+            }
           </div>
 
           {/* Controls */}
           <div className="flex items-center gap-2">
-            {!isRecording && !hasRecording && (
-              <Button
-                onClick={startRecording}
-                className="flex items-center gap-2"
-                size="lg"
-              >
+            {!isRecording && !hasRecording &&
+            <Button
+              onClick={startRecording}
+              className="flex items-center gap-2"
+              size="lg">
+
                 <Mic className="h-4 w-4" />
                 Start Recording
               </Button>
-            )}
+            }
 
-            {isRecording && (
-              <Button
-                onClick={stopRecording}
-                variant="destructive"
-                className="flex items-center gap-2"
-                size="lg"
-              >
+            {isRecording &&
+            <Button
+              onClick={stopRecording}
+              variant="destructive"
+              className="flex items-center gap-2"
+              size="lg">
+
                 <MicOff className="h-4 w-4" />
                 Stop Recording
               </Button>
-            )}
+            }
 
-            {hasRecording && (
-              <>
+            {hasRecording &&
+            <>
                 <Button
-                  onClick={playRecording}
-                  variant="outline"
-                  className="flex items-center gap-2"
-                >
+                onClick={playRecording}
+                variant="outline"
+                className="flex items-center gap-2">
+
                   {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
                   {isPlaying ? 'Pause' : 'Play'}
                 </Button>
                 
                 <Button
-                  onClick={resetRecording}
-                  variant="outline"
-                  className="flex items-center gap-2"
-                >
+                onClick={resetRecording}
+                variant="outline"
+                className="flex items-center gap-2">
+
                   <RotateCcw className="h-4 w-4" />
                   Re-record
                 </Button>
               </>
-            )}
+            }
           </div>
 
           {/* Instructions */}
@@ -217,8 +217,8 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
           </div>
         </div>
       </CardContent>
-    </Card>
-  );
+    </Card>);
+
 };
 
 export default VoiceRecorder;

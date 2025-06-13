@@ -29,7 +29,7 @@ interface RegisterData {
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const UserProvider: React.FC<{children: React.ReactNode;}> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -45,10 +45,10 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const register = async (userData: RegisterData): Promise<boolean> => {
     try {
       setIsLoading(true);
-      
+
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       const newUser: User = {
         id: Date.now().toString(),
         name: userData.name,
@@ -61,7 +61,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // Store users in localStorage (in production, this would be in a database)
       const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
-      
+
       // Check if user already exists
       if (existingUsers.some((u: User) => u.email === userData.email)) {
         throw new Error('User with this email already exists');
@@ -69,7 +69,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       existingUsers.push({ ...newUser, password: userData.password });
       localStorage.setItem('users', JSON.stringify(existingUsers));
-      
+
       console.log('User registered successfully:', newUser);
       return true;
     } catch (error) {
@@ -83,13 +83,13 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       setIsLoading(true);
-      
+
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
       const foundUser = existingUsers.find((u: any) => u.email === email && u.password === password);
-      
+
       if (!foundUser) {
         throw new Error('Invalid email or password');
       }
@@ -97,7 +97,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { password: _, ...userWithoutPassword } = foundUser;
       setUser(userWithoutPassword);
       localStorage.setItem('user', JSON.stringify(userWithoutPassword));
-      
+
       console.log('User logged in successfully:', userWithoutPassword);
       return true;
     } catch (error) {
@@ -126,8 +126,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return (
     <UserContext.Provider value={value}>
       {children}
-    </UserContext.Provider>
-  );
+    </UserContext.Provider>);
+
 };
 
 export const useUser = () => {

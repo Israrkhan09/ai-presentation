@@ -5,352 +5,551 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
+  Presentation, 
+  Upload, 
   Mic, 
-  MicOff, 
-  Play, 
-  Pause, 
-  Square, 
-  BarChart3, 
-  Brain, 
   FileText, 
-  Volume2,
-  User,
-  LogOut,
-  Settings
+  Play, 
+  Download,
+  Settings,
+  BarChart3,
+  Users,
+  Clock,
+  AlertCircle,
+  CheckCircle
 } from 'lucide-react';
-
-import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
-import SlideViewer from './SlideViewer';
-import AIProcessor from './AIProcessor';
-import QuizGenerator from './QuizGenerator';
-import PDFGenerator from './PDFGenerator';
-import VoiceCommands from './VoiceCommands';
-import SpeakerNotes from './SpeakerNotes';
 import { useUser } from '@/contexts/UserContext';
+import { useToast } from '@/hooks/use-toast';
+import FileUploader from '@/components/FileUploader';
+import PresentationList from '@/components/PresentationList';
+import VoiceControlledViewer from '@/components/VoiceControlledViewer';
 
-const PresentationDashboard = () => {
-  const { user, logout } = useUser();
-  const {
-    isListening,
-    transcript,
-    confidence,
-    startListening,
-    stopListening,
-    resetTranscript
-  } = useSpeechRecognition();
+interface PresentationData {
+  ID: number;
+  title: string;
+  filename: string;
+  file_id: number;
+  total_pages: number;
+  description: string;
+  tags: string;
+  is_active: boolean;
+  CreateTime: string;
+}
 
-  const [isPresenting, setIsPresenting] = useState(false);
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [highlightedKeywords, setHighlightedKeywords] = useState<string[]>([]);
-  const [sessionData, setSessionData] = useState({
-    startTime: null as Date | null,
-    duration: 0,
-    wordCount: 0,
-    keyPoints: [] as string[]
-  });
+const PresentationDashboard: React.FC = () => {
+  const { user } = useUser();
+  const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState('upload');
+  const [selectedPresentation, setSelectedPresentation] = useState<PresentationData | null>(null);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [isViewing, setIsViewing] = useState(false);
 
-  // Update session data
-  useEffect(() => {
-    if (transcript) {
-      setSessionData(prev => ({
-        ...prev,
-        wordCount: transcript.split(' ').length
-      }));
-    }
-  }, [transcript]);
+  // Check if speech recognition is supported
+  const isSpeechSupported = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
 
-  // Update duration timer
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (isPresenting && sessionData.startTime) {
-      interval = setInterval(() => {
-        setSessionData(prev => ({
-          ...prev,
-          duration: Math.floor((Date.now() - (prev.startTime?.getTime() || 0)) / 1000)
-        }));
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [isPresenting, sessionData.startTime]);
-
-  const startPresentation = () => {
-    setIsPresenting(true);
-    setSessionData(prev => ({
-      ...prev,
-      startTime: new Date()
-    }));
-    startListening();
-    console.log('Presentation started by:', user?.name);
-  };
-
-  const pausePresentation = () => {
-    if (isListening) {
-      stopListening();
-    } else {
-      startListening();
-    }
-  };
-
-  const stopPresentation = () => {
-    setIsPresenting(false);
-    stopListening();
-    console.log('Presentation stopped');
-  };
-
-  const resetSession = () => {
-    setIsPresenting(false);
-    stopListening();
-    resetTranscript();
-    setSessionData({
-      startTime: null,
-      duration: 0,
-      wordCount: 0,
-      keyPoints: []
+  const handleUploadComplete = (presentation: PresentationData) => {
+    console.log('Upload completed:', presentation);
+    setRefreshTrigger(prev => prev + 1);
+    setActiveTab('presentations');
+    toast({
+      title: "Success!",
+      description: "Your presentation is ready for voice control.",
     });
-    setCurrentSlide(0);
-    setHighlightedKeywords([]);
-    console.log('Session reset');
   };
 
-  const handleSlideChange = (slideIndex: number) => {
-    setCurrentSlide(slideIndex);
-    console.log('Slide changed to:', slideIndex + 1);
+  const handleSelectPresentation = (presentation: PresentationData) => {
+    console.log('Selected presentation:', presentation);
+    setSelectedPresentation(presentation);
   };
 
-  const handleKeywordsHighlight = (keywords: string[]) => {
-    setHighlightedKeywords(keywords);
-  };
-
-  const formatDuration = (seconds: number) => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
-    
-    if (hours > 0) {
-      return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  const handleStartPresentation = (presentation: PresentationData) => {
+    if (!isSpeechSupported) {
+      toast({
+        title: "Voice Control Not Available",
+        description: "Your browser doesn't support voice recognition. You can still view the presentation manually.",
+        variant: "destructive"
+      });
     }
-    return `${minutes}:${secs.toString().padStart(2, '0')}`;
+    
+    setSelectedPresentation(presentation);
+    setIsViewing(true);
   };
 
-  const handleLogout = () => {
-    logout();
+  const handleCloseViewer = () => {
+    setIsViewing(false);
+    setSelectedPresentation(null);
   };
+
+  const handleExportPresentation = async (presentation: PresentationData) => {
+    try {
+      // Create export data
+      const exportData = {
+        title: presentation.title,
+        filename: presentation.filename,
+        description: presentation.description,
+        tags: presentation.tags,
+        exportDate: new Date().toISOString(),
+        totalPages: presentation.total_pages
+      };
+
+      // Create and download JSON file
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { 
+        type: 'application/json' 
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${presentation.title}_export.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast({
+        title: "Export Successful",
+        description: "Presentation metadata exported successfully.",
+      });
+    } catch (error) {
+      console.error('Export error:', error);
+      toast({
+        title: "Export Failed",
+        description: "Failed to export presentation.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  if (!user) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Please log in to access the presentation dashboard.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
+  // Show viewer when a presentation is being viewed
+  if (isViewing && selectedPresentation) {
+    return (
+      <div className="h-screen bg-gray-50 p-4">
+        <VoiceControlledViewer 
+          presentation={selectedPresentation}
+          onClose={handleCloseViewer}
+        />
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      {/* Header with User Info */}
-      <Card className="mb-6">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <User className="h-8 w-8 text-blue-600" />
-                <div>
-                  <h1 className="text-2xl font-bold">Welcome, {user?.name || 'User'}!</h1>
-                  <p className="text-gray-600">
-                    {user?.role && <Badge variant="outline" className="mr-2">{user.role}</Badge>}
-                    AI-Powered Presentation Dashboard
-                  </p>
-                </div>
-              </div>
-              {user?.voiceProfileId && (
-                <div className="text-right">
-                  <Badge variant="secondary" className="flex items-center gap-1">
-                    <Volume2 className="h-3 w-3" />
-                    Voice Profile Active
-                  </Badge>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Registered: {new Date(user.registrationDate).toLocaleDateString()}
-                  </p>
-                </div>
-              )}
-            </div>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" className="flex items-center gap-1">
-                <Settings className="h-4 w-4" />
-                Settings
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handleLogout}
-                className="flex items-center gap-1"
-              >
-                <LogOut className="h-4 w-4" />
-                Logout
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-      </Card>
+    <div className="container mx-auto px-4 py-8">
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          AI Presentation Studio
+        </h1>
+        <p className="text-gray-600">
+          Upload, manage, and present with voice control
+        </p>
+        
+        {/* Voice Support Alert */}
+        {!isSpeechSupported && (
+          <Alert className="mt-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              Voice recognition is not supported in your browser. 
+              Consider using Chrome, Edge, or Safari for the best experience.
+            </AlertDescription>
+          </Alert>
+        )}
+      </div>
 
-      {/* Main Controls */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <span>Presentation Controls</span>
-            <div className="flex items-center gap-2">
-              {isPresenting && (
-                <Badge variant={isListening ? "default" : "secondary"} className="animate-pulse">
-                  {isListening ? 'Recording' : 'Paused'} - {formatDuration(sessionData.duration)}
-                </Badge>
-              )}
-            </div>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center gap-4">
-            {!isPresenting ? (
-              <Button
-                onClick={startPresentation}
-                className="flex items-center gap-2"
-                size="lg"
-              >
-                <Play className="h-5 w-5" />
-                Start Presentation
-              </Button>
-            ) : (
-              <>
-                <Button
-                  onClick={pausePresentation}
-                  variant="outline"
-                  className="flex items-center gap-2"
-                >
-                  {isListening ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-                  {isListening ? 'Pause' : 'Resume'}
-                </Button>
-                <Button
-                  onClick={stopPresentation}
-                  variant="destructive"
-                  className="flex items-center gap-2"
-                >
-                  <Square className="h-4 w-4" />
-                  Stop
-                </Button>
-              </>
-            )}
-
-            <Button
-              onClick={resetSession}
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              Reset Session
-            </Button>
-
-            {/* Session Stats */}
-            <div className="flex items-center gap-4 ml-auto">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">{sessionData.wordCount}</div>
-                <div className="text-xs text-gray-500">Words</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">{currentSlide + 1}</div>
-                <div className="text-xs text-gray-500">Current Slide</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-purple-600">
-                  {confidence ? Math.round(confidence * 100) : 0}%
-                </div>
-                <div className="text-xs text-gray-500">Confidence</div>
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center">
+              <FileText className="h-8 w-8 text-blue-600" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Total Presentations</p>
+                <p className="text-2xl font-bold text-gray-900">0</p>
               </div>
             </div>
-          </div>
+          </CardContent>
+        </Card>
 
-          {/* Voice Recognition Status */}
-          {isPresenting && (
-            <Alert className="mt-4">
-              <div className="flex items-center gap-2">
-                {isListening ? (
-                  <Mic className="h-4 w-4 text-green-600" />
-                ) : (
-                  <MicOff className="h-4 w-4 text-red-600" />
-                )}
-                <AlertDescription>
-                  {isListening 
-                    ? `Listening... Confidence: ${confidence ? Math.round(confidence * 100) : 0}%`
-                    : 'Speech recognition paused'
-                  }
-                </AlertDescription>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center">
+              <Mic className="h-8 w-8 text-green-600" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Voice Control</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {isSpeechSupported ? 'Ready' : 'N/A'}
+                </p>
               </div>
-            </Alert>
-          )}
-        </CardContent>
-      </Card>
+            </div>
+          </CardContent>
+        </Card>
 
-      {/* Main Dashboard */}
-      <Tabs defaultValue="slides" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="slides" className="flex items-center gap-2">
-            <FileText className="h-4 w-4" />
-            Slides
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center">
+              <Clock className="h-8 w-8 text-orange-600" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Last Activity</p>
+                <p className="text-2xl font-bold text-gray-900">Today</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center">
+              <BarChart3 className="h-8 w-8 text-purple-600" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Success Rate</p>
+                <p className="text-2xl font-bold text-gray-900">100%</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Main Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="upload" className="flex items-center">
+            <Upload className="w-4 h-4 mr-2" />
+            Upload
           </TabsTrigger>
-          <TabsTrigger value="ai" className="flex items-center gap-2">
-            <Brain className="h-4 w-4" />
-            AI Analysis
+          <TabsTrigger value="presentations" className="flex items-center">
+            <FileText className="w-4 h-4 mr-2" />
+            Presentations
           </TabsTrigger>
-          <TabsTrigger value="quiz" className="flex items-center gap-2">
-            <BarChart3 className="h-4 w-4" />
-            Quiz
-          </TabsTrigger>
-          <TabsTrigger value="pdf" className="flex items-center gap-2">
-            <FileText className="h-4 w-4" />
-            Export
-          </TabsTrigger>
-          <TabsTrigger value="voice" className="flex items-center gap-2">
-            <Volume2 className="h-4 w-4" />
+          <TabsTrigger value="voice" className="flex items-center">
+            <Mic className="w-4 h-4 mr-2" />
             Voice Control
           </TabsTrigger>
-          <TabsTrigger value="notes" className="flex items-center gap-2">
-            <FileText className="h-4 w-4" />
-            Notes
+          <TabsTrigger value="export" className="flex items-center">
+            <Download className="w-4 h-4 mr-2" />
+            Export
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="slides">
-          <SlideViewer
-            highlightedKeywords={highlightedKeywords}
-            onSlideChange={handleSlideChange}
-            autoAdvance={false}
-          />
+        {/* Upload Tab */}
+        <TabsContent value="upload" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+              <h2 className="text-xl font-semibold mb-4">Upload New Presentation</h2>
+              <FileUploader 
+                onUploadComplete={handleUploadComplete}
+                userId={user.ID}
+              />
+            </div>
+            
+            <div className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Upload Instructions</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex items-start space-x-3">
+                    <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
+                    <div>
+                      <p className="font-medium">Drag & Drop PDF</p>
+                      <p className="text-sm text-gray-600">Simply drag your PDF file into the upload area</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
+                    <div>
+                      <p className="font-medium">Add Details</p>
+                      <p className="text-sm text-gray-600">Provide title, description, and tags</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
+                    <div>
+                      <p className="font-medium">Voice Ready</p>
+                      <p className="text-sm text-gray-600">Start presenting with voice commands</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Supported Features</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Badge variant="secondary" className="justify-center">
+                      <Mic className="w-3 h-3 mr-1" />
+                      Voice Control
+                    </Badge>
+                    <Badge variant="secondary" className="justify-center">
+                      <Play className="w-3 h-3 mr-1" />
+                      Auto-Advance
+                    </Badge>
+                    <Badge variant="secondary" className="justify-center">
+                      <FileText className="w-3 h-3 mr-1" />
+                      Speaker Notes
+                    </Badge>
+                    <Badge variant="secondary" className="justify-center">
+                      <Download className="w-3 h-3 mr-1" />
+                      Export Data
+                    </Badge>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         </TabsContent>
 
-        <TabsContent value="ai">
-          <AIProcessor
-            transcript={transcript}
-            isProcessing={isListening}
-            onKeywordsExtracted={handleKeywordsHighlight}
-          />
+        {/* Presentations Tab */}
+        <TabsContent value="presentations" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <PresentationList 
+                userId={user.ID}
+                onSelectPresentation={handleSelectPresentation}
+                refreshTrigger={refreshTrigger}
+              />
+            </div>
+            
+            <div className="space-y-4">
+              {selectedPresentation ? (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Selected Presentation</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <h3 className="font-semibold">{selectedPresentation.title}</h3>
+                      <p className="text-sm text-gray-600">{selectedPresentation.filename}</p>
+                    </div>
+                    
+                    {selectedPresentation.description && (
+                      <div>
+                        <p className="text-sm font-medium">Description:</p>
+                        <p className="text-sm text-gray-600">{selectedPresentation.description}</p>
+                      </div>
+                    )}
+
+                    <div className="space-y-2">
+                      <Button 
+                        onClick={() => handleStartPresentation(selectedPresentation)}
+                        className="w-full"
+                      >
+                        <Play className="w-4 h-4 mr-2" />
+                        Start Presentation
+                      </Button>
+                      
+                      <Button 
+                        onClick={() => handleExportPresentation(selectedPresentation)}
+                        variant="outline" 
+                        className="w-full"
+                      >
+                        <Download className="w-4 h-4 mr-2" />
+                        Export Data
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : (
+                <Card>
+                  <CardContent className="p-6 text-center">
+                    <FileText className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                    <p className="text-sm text-gray-600">
+                      Select a presentation to view details
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </div>
         </TabsContent>
 
-        <TabsContent value="quiz">
-          <QuizGenerator transcript={transcript} />
+        {/* Voice Control Tab */}
+        <TabsContent value="voice" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Voice Commands Guide</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  <div>
+                    <h4 className="font-medium">Navigation Commands</h4>
+                    <div className="grid grid-cols-2 gap-2 mt-2">
+                      <Badge variant="outline">"Next slide"</Badge>
+                      <Badge variant="outline">"Previous slide"</Badge>
+                      <Badge variant="outline">"First slide"</Badge>
+                      <Badge variant="outline">"Last slide"</Badge>
+                      <Badge variant="outline">"Slide 5"</Badge>
+                      <Badge variant="outline">"Go to slide 3"</Badge>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="font-medium">Presentation Control</h4>
+                    <div className="grid grid-cols-2 gap-2 mt-2">
+                      <Badge variant="outline">"Start presentation"</Badge>
+                      <Badge variant="outline">"Stop presentation"</Badge>
+                      <Badge variant="outline">"Pause"</Badge>
+                      <Badge variant="outline">"Resume"</Badge>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="font-medium">Visual Commands</h4>
+                    <div className="grid grid-cols-2 gap-2 mt-2">
+                      <Badge variant="outline">"Highlight point"</Badge>
+                      <Badge variant="outline">"Zoom in"</Badge>
+                      <Badge variant="outline">"Zoom out"</Badge>
+                      <Badge variant="outline">"Fullscreen"</Badge>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Voice Control Status</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span>Browser Support</span>
+                  <Badge variant={isSpeechSupported ? "default" : "destructive"}>
+                    {isSpeechSupported ? "Supported" : "Not Supported"}
+                  </Badge>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span>Microphone Access</span>
+                  <Badge variant="secondary">Ready</Badge>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span>Language Support</span>
+                  <Badge variant="default">English (US)</Badge>
+                </div>
+
+                {!isSpeechSupported && (
+                  <Alert>
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      For voice control, please use Chrome, Edge, or Safari browser.
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
-        <TabsContent value="pdf">
-          <PDFGenerator
-            transcript={transcript}
-            sessionData={{
-              ...sessionData,
-              currentSlide: currentSlide + 1,
-              userName: user?.name || 'Unknown User',
-              userRole: user?.role || 'Presenter'
-            }}
-          />
-        </TabsContent>
+        {/* Export Tab */}
+        <TabsContent value="export" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Export Options</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  <div className="p-4 border rounded-lg">
+                    <h4 className="font-medium mb-2">Presentation Metadata</h4>
+                    <p className="text-sm text-gray-600 mb-3">
+                      Export presentation details, settings, and statistics as JSON
+                    </p>
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      disabled={!selectedPresentation}
+                      onClick={() => selectedPresentation && handleExportPresentation(selectedPresentation)}
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Export JSON
+                    </Button>
+                  </div>
 
-        <TabsContent value="voice">
-          <VoiceCommands
-            isListening={isListening}
-            transcript={transcript}
-          />
-        </TabsContent>
+                  <div className="p-4 border rounded-lg">
+                    <h4 className="font-medium mb-2">Voice Commands Log</h4>
+                    <p className="text-sm text-gray-600 mb-3">
+                      Export voice command history and usage statistics
+                    </p>
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      disabled
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Export Log (Coming Soon)
+                    </Button>
+                  </div>
 
-        <TabsContent value="notes">
-          <SpeakerNotes
-            transcript={transcript}
-            currentSlide={currentSlide}
-          />
+                  <div className="p-4 border rounded-lg">
+                    <h4 className="font-medium mb-2">Presentation Report</h4>
+                    <p className="text-sm text-gray-600 mb-3">
+                      Generate a comprehensive presentation report
+                    </p>
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      disabled
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Generate Report (Coming Soon)
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Export Instructions</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex items-start space-x-3">
+                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
+                  <div>
+                    <p className="font-medium">Select Presentation</p>
+                    <p className="text-sm text-gray-600">Choose a presentation from the presentations tab</p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
+                  <div>
+                    <p className="font-medium">Choose Export Type</p>
+                    <p className="text-sm text-gray-600">Select the type of data you want to export</p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
+                  <div>
+                    <p className="font-medium">Download File</p>
+                    <p className="text-sm text-gray-600">The file will be downloaded to your device</p>
+                  </div>
+                </div>
+
+                {!selectedPresentation && (
+                  <Alert className="mt-4">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      Please select a presentation first to enable export options.
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
       </Tabs>
     </div>

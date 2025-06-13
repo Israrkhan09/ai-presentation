@@ -2,55 +2,55 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Brain, 
-  Mic, 
-  FileText, 
-  BarChart3, 
-  Volume2, 
+import {
+  Brain,
+  Mic,
+  FileText,
+  BarChart3,
+  Volume2,
   Zap,
   ArrowRight,
   UserPlus,
   LogIn,
-  CheckCircle
-} from 'lucide-react';
+  CheckCircle } from
+'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const HomePage = () => {
   const navigate = useNavigate();
 
   const features = [
-    {
-      icon: <Mic className="h-8 w-8 text-blue-600" />,
-      title: "Real-Time Speech Recognition",
-      description: "Advanced AI listens and transcribes your speech with high accuracy, providing real-time feedback."
-    },
-    {
-      icon: <Brain className="h-8 w-8 text-purple-600" />,
-      title: "AI Content Analysis",
-      description: "Intelligent analysis of your presentation content with keyword extraction and topic insights."
-    },
-    {
-      icon: <Volume2 className="h-8 w-8 text-green-600" />,
-      title: "Voice-Controlled Navigation",
-      description: "Control your presentation hands-free with natural voice commands and gestures."
-    },
-    {
-      icon: <BarChart3 className="h-8 w-8 text-orange-600" />,
-      title: "Auto-Generated Quizzes",
-      description: "Automatically create MCQs and theory questions based on your presentation content."
-    },
-    {
-      icon: <FileText className="h-8 w-8 text-red-600" />,
-      title: "PDF Export & Notes",
-      description: "Export your presentation data, transcripts, and speaker notes as professional PDFs."
-    },
-    {
-      icon: <Zap className="h-8 w-8 text-yellow-600" />,
-      title: "Personalized Experience",
-      description: "Custom voice profiles and personalized dashboards tailored to your presentation style."
-    }
-  ];
+  {
+    icon: <Mic className="h-8 w-8 text-blue-600" />,
+    title: "Real-Time Speech Recognition",
+    description: "Advanced AI listens and transcribes your speech with high accuracy, providing real-time feedback."
+  },
+  {
+    icon: <Brain className="h-8 w-8 text-purple-600" />,
+    title: "AI Content Analysis",
+    description: "Intelligent analysis of your presentation content with keyword extraction and topic insights."
+  },
+  {
+    icon: <Volume2 className="h-8 w-8 text-green-600" />,
+    title: "Voice-Controlled Navigation",
+    description: "Control your presentation hands-free with natural voice commands and gestures."
+  },
+  {
+    icon: <BarChart3 className="h-8 w-8 text-orange-600" />,
+    title: "Auto-Generated Quizzes",
+    description: "Automatically create MCQs and theory questions based on your presentation content."
+  },
+  {
+    icon: <FileText className="h-8 w-8 text-red-600" />,
+    title: "PDF Export & Notes",
+    description: "Export your presentation data, transcripts, and speaker notes as professional PDFs."
+  },
+  {
+    icon: <Zap className="h-8 w-8 text-yellow-600" />,
+    title: "Personalized Experience",
+    description: "Custom voice profiles and personalized dashboards tailored to your presentation style."
+  }];
+
 
   const goToRegister = () => {
     navigate('/register');
@@ -104,21 +104,21 @@ const HomePage = () => {
           </p>
           
           <div className="flex items-center justify-center gap-4">
-            <Button 
-              size="lg" 
+            <Button
+              size="lg"
               onClick={goToRegister}
-              className="flex items-center gap-2 text-lg px-8 py-4"
-            >
+              className="flex items-center gap-2 text-lg px-8 py-4">
+
               Get Started Free
               <ArrowRight className="h-5 w-5" />
             </Button>
             
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size="lg"
               onClick={goToLogin}
-              className="flex items-center gap-2 text-lg px-8 py-4"
-            >
+              className="flex items-center gap-2 text-lg px-8 py-4">
+
               <LogIn className="h-5 w-5" />
               Sign In
             </Button>
@@ -140,8 +140,8 @@ const HomePage = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature, index) => (
-              <Card key={index} className="h-full hover:shadow-lg transition-shadow duration-300">
+            {features.map((feature, index) =>
+            <Card key={index} className="h-full hover:shadow-lg transition-shadow duration-300">
                 <CardHeader>
                   <div className="flex items-center gap-3 mb-2">
                     {feature.icon}
@@ -152,7 +152,7 @@ const HomePage = () => {
                   <p className="text-gray-600">{feature.description}</p>
                 </CardContent>
               </Card>
-            ))}
+            )}
           </div>
         </div>
       </section>
@@ -248,12 +248,12 @@ const HomePage = () => {
           </p>
           
           <div className="flex items-center justify-center gap-4">
-            <Button 
-              size="lg" 
+            <Button
+              size="lg"
               variant="secondary"
               onClick={goToRegister}
-              className="flex items-center gap-2 text-lg px-8 py-4"
-            >
+              className="flex items-center gap-2 text-lg px-8 py-4">
+
               Start Your Free Trial
               <ArrowRight className="h-5 w-5" />
             </Button>
@@ -273,8 +273,8 @@ const HomePage = () => {
           </p>
         </div>
       </footer>
-    </div>
-  );
+    </div>);
+
 };
 
 export default HomePage;
